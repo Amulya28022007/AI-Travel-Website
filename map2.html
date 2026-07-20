@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TravelVerse – 360° VR Travel</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+  <!-- A-Frame VR -->
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+
+  <style>
+    /* ── RESET & BASE ── */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    :root {
+      --orange:   #f97316;
+      --orange2:  #ea580c;
+      --dark:     #020617;
+      --card-bg:  #0f172a;
+      --text:     #e2e8f0;
+      --muted:    #94a3b8;
+      --radius:   16px;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      padding: 24px;
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 1500px;
+      margin: auto;
+      background: var(--dark);
+      border-radius: 22px;
+      overflow: hidden;
+    }
+
+    /* ── HERO ── */
+    .top-hero {
+      position: relative;
+      padding: 90px 70px 70px;
+      color: white;
+      background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1600') center/cover no-repeat;
+      overflow: hidden;
+    }
+    .top-hero::before {
+      content:'';
+      position:absolute; inset:0;
+      background: linear-gradient(to bottom right, rgba(2,6,23,.65), rgba(249,115,22,.18));
+    }
+    .top-hero > * { position:relative; z-index:1; }
+    .hero-title {
+      font-family:'Playfair Display', serif;
+      font-size: 3.6rem;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+    }
+    .hero-sub { margin-top:10px; color: rgba(255,255,255,.75); font-size:.95rem; }
+
+    /* ── SECTION ── */
+    .section { padding: 40px; color: var(--text); }
+    .section h2 {
+      font-family:'Playfair Display', serif;
+      font-size: 1.8rem;
+      margin-bottom: 22px;
+      color: var(--orange);
+    }
+
+    /* ── CONTROLS ── */
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .controls input,
+    .controls select {
+      padding: 12px 16px;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 12px;
+      background: #0f172a;
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+      font-size: .9rem;
+      flex: 1;
+      min-width: 160px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .controls input:focus,
+    .controls select:focus { border-color: var(--orange); }
+    .controls select option { background: #0f172a; }
+
+    /* ── DESTINATION GRID ── */
+    .dest-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 22px;
+    }
+    .dest-card {
+      background: #0f172a;
+      border-radius: 18px;
+      overflow: hidden;
+      transition: transform .3s, box-shadow .3s;
+      border: 1px solid rgba(255,255,255,.05);
+      cursor: pointer;
+    }
+    .dest-card:hover {
+      transform: translateY(-7px);
+      box-shadow: 0 18px 40px rgba(0,0,0,.5);
+    }
+    .dest-image {
+      height: 200px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+    .dest-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(249,115,22,.9);
+      color: white;
+      font-size: .7rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 20px;
+      backdrop-filter: blur(4px);
+    }
+    .dest-content { padding: 18px; }
+    .dest-title {
+      font-family:'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: white;
+    }
+    .dest-sub { color: var(--muted); margin: 8px 0 14px; font-size: .82rem; }
+
+    /* ── BUTTON ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 12px;
+      background: var(--orange);
+      color: white;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      font-size: .85rem;
+      font-weight: 500;
+      transition: background .2s, transform .15s;
+    }
+    .btn:hover { background: var(--orange2); transform: scale(1.03); }
+    .btn-ghost {
+      background: transparent;
+      border: 1.5px solid var(--orange);
+      color: var(--orange);
+    }
+    .btn-ghost:hover { background: var(--orange); color: white; }
+    .btn-dark {
+      background: #1e293b;
+      color: white;
+    }
+    .btn-dark:hover { background: #334155; }
+
+    /* ── ITINERARY ── */
+    #itineraryDays .itin-day {
+      background: #0f172a;
+      border-left: 4px solid var(--orange);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 12px;
+    }
+    #itineraryDays .itin-day h4 { color: white; margin-bottom: 6px; font-size: .95rem; }
+    #itineraryDays .itin-day p  { color: var(--muted); font-size: .82rem; white-space: pre-line; }
+    .card-form input,
+    .card-form textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 10px;
+      background: #1e293b;
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+      font-size: .88rem;
+      margin-bottom: 10px;
+      outline: none;
+      resize: vertical;
+    }
+    .card-form textarea { min-height: 90px; }
+    .card-form input:focus,
+    .card-form textarea:focus { border-color: var(--orange); }
+
+    /* ── BUDGET ── */
+    .budget-box {
+      background: #0f172a;
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 500px;
+    }
+    .budget-box select,
+    .budget-box input {
+      padding: 11px 14px;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 10px;
+      background: #1e293b;
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+      font-size: .88rem;
+      outline: none;
+    }
+    .budget-box select option { background: #0f172a; }
+    #budgetResult {
+      color: var(--text);
+      font-size: .9rem;
+      line-height: 1.8;
+    }
+
+    /* ── MODAL ── */
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 30px 16px;
+      background: rgba(0,0,0,.88);
+      overflow-y: auto;
+      z-index: 999;
+    }
+    .modal.open { display: flex; }
+    .modal-card {
+      width: 100%;
+      max-width: 1200px;
+      background: #0f172a;
+      border-radius: 20px;
+      overflow: hidden;
+      color: var(--text);
+    }
+    .modal-head {
+      padding: 22px 26px;
+      background: linear-gradient(90deg, var(--orange), var(--orange2));
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-head h2 { font-family:'Playfair Display', serif; font-size: 1.6rem; }
+    .modal-head p { font-size: .82rem; opacity: .85; margin-top: 3px; }
+
+    .modal-body {
+      padding: 26px;
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 22px;
+    }
+
+    .card {
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 14px;
+      margin-bottom: 20px;
+    }
+    .card h3 { color: var(--orange); margin-bottom: 10px; font-size: 1rem; }
+    .card p  { font-size: .88rem; line-height: 1.7; color: var(--muted); }
+
+    ul { list-style: none; }
+    li {
+      background: #0f172a;
+      margin-bottom: 8px;
+      padding: 9px 12px;
+      border-left: 4px solid var(--orange);
+      border-radius: 8px;
+      font-size: .84rem;
+      color: var(--text);
+    }
+
+    /* ── VR Container ── */
+    #vrContainer {
+      height: 420px;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      background: #000;
+      position: relative;
+    }
+    #vrContainer a-scene { height: 100%; }
+    .vr-label {
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      background: rgba(249,115,22,.85);
+      color: white;
+      font-size: .72rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .vr-controls {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    /* ── MAP ── */
+    #map {
+      height: 200px;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    /* ── DETAILS GRID ── */
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    /* ── WISHLIST ── */
+    .wish-empty { color: var(--muted); font-size: .85rem; font-style: italic; }
+
+    /* ── WEATHER CARD ── */
+    .weather-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .weather-icon { font-size: 1.6rem; }
+    .weather-temp { font-size: 1.4rem; font-weight: 600; color: white; }
+    .weather-desc { font-size: .82rem; color: var(--muted); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .modal-body { grid-template-columns: 1fr; }
+      .details-grid { grid-template-columns: 1fr; }
+      .hero-title { font-size: 2.2rem; }
+    }
+    @media (max-width: 600px) {
+      .top-hero { padding: 50px 24px; }
+      .section { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- HERO -->
+  <header class="top-hero">
+    <h1 class="hero-title">TravelVerse</h1>
+    <p class="hero-sub">Explore destinations with 360° immersive views, live weather & smart planning tools</p>
+  </header>
+
+  <!-- DESTINATIONS -->
+  <section class="section">
+    <h2>✈️ Popular Destinations</h2>
+    <div class="controls">
+      <input type="text" id="searchInput" placeholder="🔍 Search destination…">
+      <select id="filterSelect">
+        <option value="all">All Categories</option>
+        <option value="heritage">Heritage</option>
+        <option value="beach">Beach</option>
+        <option value="hill">Hill Station</option>
+        <option value="spiritual">Spiritual</option>
+        <option value="metro">Metro City</option>
+        <option value="nature">Nature</option>
+      </select>
+    </div>
+    <div class="dest-grid" id="grid"></div>
+  </section>
+
+  <!-- ITINERARY -->
+  <section class="section">
+    <h2>🧳 My Itinerary</h2>
+    <div class="card card-form">
+      <input id="dayTitle" placeholder="Day 1: Haridwar to Barkot">
+      <textarea id="dayDetails" placeholder="• Morning drive from Haridwar&#10;• Scenic Himalayan views&#10;• Overnight stay at Barkot"></textarea>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" onclick="addDay()">➕ Add Day</button>
+        <button class="btn btn-ghost" onclick="clearItinerary()">🗑 Clear</button>
+      </div>
+    </div>
+    <div id="itineraryDays"></div>
+  </section>
+
+  <!-- BUDGET -->
+  <section class="section">
+    <h2>💰 Smart Budget Planner</h2>
+    <div class="budget-box">
+      <select id="budgetPlace"><option value="">— Select Destination —</option></select>
+      <button class="btn btn-dark" id="budgetSearchBtn" onclick="searchBudgetPlace()">🔍 Search Destination</button>
+      <input type="number" id="people" placeholder="Number of people" min="1">
+      <input type="number" id="days"   placeholder="Number of days" min="1">
+      <button class="btn" onclick="calculateBudget()">Calculate Budget</button>
+      <div id="budgetResult"></div>
+    </div>
+  </section>
+
+</div><!-- /.page -->
+
+
+<!-- ─────────── MODAL ─────────── -->
+<div class="modal" id="modal">
+  <div class="modal-card">
+
+    <div class="modal-head">
+      <div>
+        <h2 id="mTitle"></h2>
+        <p  id="mSub"></p>
+      </div>
+      <button class="btn btn-dark" onclick="closeModal()">✕ Close</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- LEFT COLUMN -->
+      <div>
+        <!-- 360° VR View -->
+        <div id="vrContainer">
+          <div class="vr-label">🥽 360° Immersive View – drag to look around</div>
+          <div class="vr-controls">
+            <button class="btn btn-dark" id="vrPrevBtn" onclick="cycleVR(-1)" style="padding:6px 10px;font-size:.75rem">◀ Prev</button>
+            <button class="btn btn-dark" id="vrNextBtn" onclick="cycleVR(1)"  style="padding:6px 10px;font-size:.75rem">Next ▶</button>
+          </div>
+        </div>
+
+        <!-- Leaflet Map -->
+        <div id="map"></div>
+
+        <div class="card"><h3>About</h3><p id="mDesc"></p></div>
+        <div class="card"><h3>🗺 Places to Visit</h3><ul id="mPlaces"></ul></div>
+
+        <div class="details-grid">
+          <div class="card"><h3>🗓 Best Time</h3><p id="mBest"></p></div>
+          <div class="card"><h3>🌟 Famous For</h3><p id="mFamous"></p></div>
+          <div class="card"><h3>🍽 Local Food</h3><p id="mFood"></p></div>
+          <div class="card"><h3>⏱ How to Reach</h3><p id="mReach"></p></div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div>
+
+        <!-- Live Weather -->
+        <div class="card">
+          <h3>🌦 Current Weather</h3>
+          <div id="weatherContent"><p class="weather-desc">Loading…</p></div>
+        </div>
+
+        <!-- Nearby Railway -->
+        <div class="card"><h3>🚆 Nearby Railway Station</h3><ul id="mRail"></ul></div>
+
+        <!-- Travel Tips -->
+        <div class="card"><h3>🧠 Travel Tips</h3><ul id="mTips"></ul></div>
+
+        <!-- Wishlist -->
+        <div class="card">
+          <h3>❤️ Wishlist</h3>
+          <ul id="wishlistList"></ul>
+          <button class="btn" style="margin-top:10px" onclick="toggleWishlist()">Toggle Wishlist</button>
+        </div>
+
+        <!-- Add to Itinerary -->
+        <div class="card">
+          <h3>📋 Quick Add</h3>
+          <button class="btn btn-ghost" onclick="addCurrentToItinerary()">➕ Add Destination to Itinerary</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+/* ═══════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════ */
+const CITIES = [
+  {
+    name:'Agra',
+    costPerDay:2500,
+    category:'heritage',
+    sub:'Uttar Pradesh – City of the Taj Mahal',
+    img:'https://images.unsplash.com/photo-1564507592333-c60657eea523',
+    desc:'Agra, on the banks...',
+    places:['Taj Mahal','Agra Fort'],
+    best:'October to March',
+    famous:'Mughal architecture',
+    food:'Petha',
+    rail:['Agra Cantt'],
+    reach:'Delhi via Yamuna Expressway',
+    tips:['Pre-book Taj tickets'],
+    lat:27.1767,
+    lng:78.0081,
+    vrTours:[
+      {
+        title:'Taj Mahal VR',
+        type:'iframe',
+        url:'https://www.airpano.com/360photo/india-taj-mahal/'
+      },
+      {
+        title:'Agra Fort VR',
+        type:'iframe',
+        url:'https://www.360cities.net/image/taj-mahal-india'
+      }
+    ]
+  },
+  {
+    name:'Jaipur', costPerDay:3000, category:'heritage',
+    sub:'Rajasthan – The Pink City',
+    img:'https://images.unsplash.com/photo-1602339752474-f77aa7bcaecd?q=80&w=1600&auto=format&fit=crop',
+    desc:'Jaipur, the capital of Rajasthan, is known as the Pink City due to its rose-coloured historic buildings. Founded in 1727, it is one of India\'s first planned cities and showcases the grandeur of Rajput architecture through magnificent forts, palaces, and astronomical structures.',
+    places:['Amber Fort','Hawa Mahal','City Palace','Jantar Mantar','Jaigarh Fort','Nahargarh Fort','Jal Mahal','Patrika Gate'],
+    best:'October to March; the Jaipur Literature Festival is held in January.',
+    famous:'Pink City architecture, royal bazaars, handicrafts, gemstones.',
+    food:'Dal Baati Churma, Ghewar, Laal Maas, Pyaaz Kachori, Mawa Kachori.',
+    rail:['Jaipur Junction'],
+    reach:'Jaipur International Airport with daily flights; well connected by Rajdhani and Shatabdi trains.',
+    tips:['Visit Amber Fort early to avoid crowds.','Nahargarh Fort offers the best sunset city view.','Bargaining is common in Johari Bazaar.','Festival season (Diwali, Teej) is vibrant but crowded.'],
+    lat:26.9124, lng:75.7873,
+    vrImages:[
+'https://upload.wikimedia.org/wikipedia/commons/1/10/Hawa_Mahal_Panorama.jpg'
+]
+  },
+  {
+    name:'Goa', costPerDay:3500, category:'beach',
+    sub:'Beach Paradise – Sun, sand, nightlife, and Portuguese heritage',
+    img:'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?q=80&w=1600&auto=format&fit=crop',
+    desc:'Goa is India\'s most popular beach destination, known for golden beaches, lively nightlife, Portuguese-influenced architecture, and a relaxed coastal lifestyle. Once a Portuguese colony, Goa reflects a unique blend of Indian and European cultures across North and South Goa.',
+    places:['Baga Beach','Calangute Beach','Anjuna Beach','Fort Aguada','Basilica of Bom Jesus','Dudhsagar Waterfalls','Chapora Fort','Palolem Beach'],
+    best:'November to February; monsoons bring lush greenery but limit water sports.',
+    famous:'Beaches, nightlife, water sports, Portuguese architecture, seafood.',
+    food:'Fish curry rice, prawn balchao, vindaloo, xacuti, bebinca dessert.',
+    rail:['Madgaon Railway Station (Margao)'],
+    reach:'Dabolim or Mopa Airport with multiple daily flights; Konkan Railway connects to Mumbai and Mangalore.',
+    tips:['Always wear a helmet on scooter rentals.','Choose licensed water sports operators.','Use sunscreen — beaches face direct western sun.','Keep valuables secured at beach shacks.'],
+    lat:15.2993, lng:74.1240,
+    vrImages:[
+'https://upload.wikimedia.org/wikipedia/commons/6/65/Goa_Beach_360.jpg'
+]
+  },
+  {
+    name:'Manali', costPerDay:3000, category:'hill',
+    sub:'Himachal Pradesh – Adventure hub amid snow-capped valleys',
+    img:'https://images.unsplash.com/photo-1706696435436-200ba23cda35?q=80&w=1600&auto=format&fit=crop',
+    desc:'Manali is a popular hill station in the Kullu district of Himachal Pradesh, nestled in the Beas River valley. Surrounded by towering Himalayan peaks, it is known for breathtaking landscapes and adventure activities including paragliding, skiing, river rafting, and trekking.',
+    places:['Solang Valley','Rohtang Pass','Hadimba Temple','Old Manali','Jogini Waterfalls','Vashisht Hot Springs','Mall Road Manali','Beas Kund Trek'],
+    best:'October–February for snow and winter sports; March–June for sightseeing.',
+    famous:'Adventure sports, snow-capped landscapes, Himalayan views, backpacker culture.',
+    food:'Momos, thukpa, siddu, trout fish, Himachali thali, local rajma chawal.',
+    rail:['Chandigarh Railway Station (~7 hrs by road)'],
+    reach:'Bhuntar Airport (Kullu) nearest; overnight Volvo buses from Delhi are popular.',
+    tips:['Rohtang Pass requires permits — apply online in advance.','Acclimatize for a day before trekking.','Heavy snowfall can close roads December–February.','Carry cash as ATMs fail in remote areas.'],
+    lat:32.2396, lng:77.1887,
+    vrImages:[
+'https://www.360cities.net/image/manali-himachal-pradesh-india'
+]
+  },
+  {
+    name:'Varanasi', costPerDay:2200, category:'spiritual',
+    sub:'Uttar Pradesh – Spiritual capital of India on the Ganges',
+    img:'https://images.unsplash.com/photo-1561361513-2d000a50f0dc?q=80&w=1600&auto=format&fit=crop',
+    desc:'Varanasi, also known as Kashi or Banaras, is one of the oldest continuously inhabited cities in the world. Situated on the banks of the holy Ganges, it is the spiritual capital of India and one of the most sacred cities in Hinduism. The city is famous for its ancient ghats, temples, Ganga Aarti ceremonies, and silk weaving traditions.',
+    places:['Dashashwamedh Ghat','Kashi Vishwanath Temple','Manikarnika Ghat','Sarnath','Assi Ghat','Ramnagar Fort','Tulsi Manas Temple'],
+    best:'October to March; the Ganga Aarti is magical year-round.',
+    famous:'Ganga Aarti, ghats, Banarasi silk, street food, Kashi Vishwanath Temple.',
+    food:'Kachori sabzi, Banarasi paan, thandai, malaiyo, chaat, lassi, baati chokha.',
+    rail:['Varanasi Junction (BSB)','Manduadih Railway Station'],
+    reach:'Lal Bahadur Shastri International Airport; Rajdhani and Shatabdi trains from major cities.',
+    tips:['Attend the Ganga Aarti at Dashashwamedh Ghat at sunset.','Boat rides at sunrise offer the best ghat experience.','Carry cash for temple offerings and local shops.','Avoid narrow lanes at night in the old city.'],
+    lat:25.3176, lng:82.9739,
+    vrImages:[
+'https://www.360cities.net/image/varanasi-ganga-aarti-india'
+]
+  },
+  {
+    name:'Delhi', costPerDay:3500, category:'metro',
+    sub:'Capital of India – Ancient heritage meets modern urban life',
+    img:'https://images.unsplash.com/photo-1587474260584-136574528ed5?q=80&w=1600&auto=format&fit=crop',
+    desc:'Delhi, India\'s capital, is a city where ancient history and modern development coexist. With roots dating back thousands of years, it has served as the capital of several powerful empires, leaving behind a rich legacy of monuments, forts, and cultural landmarks across Old and New Delhi.',
+    places:['Red Fort','Qutub Minar','India Gate','Humayun\'s Tomb','Lotus Temple','Akshardham Temple','Jama Masjid','Chandni Chowk'],
+    best:'October to March; avoid summer heat (April–June) and monsoon humidity.',
+    famous:'Historic monuments, street food culture, bustling markets, political importance.',
+    food:'Chole bhature, butter chicken, kebabs at Karim\'s, parathas at Paranthe Wali Gali, momos.',
+    rail:['New Delhi Railway Station','Hazrat Nizamuddin Railway Station'],
+    reach:'Indira Gandhi International Airport — one of Asia\'s busiest. Excellent metro connectivity.',
+    tips:['Use the Delhi Metro for fast and affordable travel.','Air quality can be poor in winter — check AQI.','Visit Red Fort on Independence Day for the flag ceremony.','Carry small change for local markets.'],
+    lat:28.6139, lng:77.2090,
+    vrImages:[
+'https://www.360cities.net/image/red-fort-delhi-india'
+]
+  },
+  {
+    name:'Darjeeling', costPerDay:2800, category:'hill',
+    sub:'West Bengal – Tea paradise with Himalayan views',
+    img:'https://images.unsplash.com/photo-1671711847762-b8308b444a42?q=80&w=1600&auto=format&fit=crop',
+    desc:'Darjeeling is a scenic hill town in the Lesser Himalayas of West Bengal, renowned worldwide for its premium tea plantations and breathtaking views of Mount Kanchenjunga, the third-highest peak in the world. It retains colonial charm through heritage buildings and the iconic Darjeeling Himalayan Railway, a UNESCO World Heritage Site.',
+    places:['Tiger Hill (sunrise)','Darjeeling Tea Gardens','Batasia Loop','Himalayan Toy Train','Peace Pagoda','Himalayan Mountaineering Institute','Padmaja Naidu Zoo'],
+    best:'March–May and October for clear mountain views.',
+    famous:'Darjeeling tea, toy train, Kanchenjunga views, colonial architecture.',
+    food:'Momos, thukpa, Darjeeling tea, noodles, sel roti, Tibetan butter tea.',
+    rail:['New Jalpaiguri (NJP) ~3 hrs away'],
+    reach:'Bagdogra Airport near Siliguri, then road or toy train to Darjeeling.',
+    tips:['Reach Tiger Hill by 4 AM for sunrise and clear Kanchenjunga views.','Book toy train tickets well in advance.','Carry warm layers even in summer — mornings are cold.','Buy certified Darjeeling tea from reputed gardens.'],
+    lat:27.0360, lng:88.2627,
+    vrImages:[
+'https://www.360cities.net/image/tiger-hill-darjeeling-india'
+]
+  },
+  {
+    name:'Kerala', costPerDay:3000, category:'nature',
+    sub:'God\'s Own Country – Backwaters, beaches, hills & Ayurveda',
+    img:'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?q=80&w=1600&auto=format&fit=crop',
+    desc:'Kerala, on India\'s southwestern coast, is fondly called "God\'s Own Country." The state offers diverse landscapes from the serene backwaters of Alleppey to tea gardens of Munnar, wildlife in Wayanad, and pristine beaches. It is a global hub for Ayurveda and classical arts like Kathakali and Kalaripayattu.',
+    places:['Alleppey Backwaters','Munnar Tea Gardens','Kochi Fort Area','Wayanad','Varkala Cliff','Kumarakom','Thekkady Wildlife','Marari Beach'],
+    best:'September to March; monsoons (June–August) are ideal for Ayurveda.',
+    famous:'Serene backwaters, Ayurveda retreats, lush hills, Kathakali, seafood.',
+    food:'Sadya (banana-leaf feast), appam with stew, puttu & kadala, fish moilee, Malabar biryani.',
+    rail:['Ernakulam Junction (Kochi)'],
+    reach:'Cochin International Airport (one of India\'s largest); well connected by train along the coast.',
+    tips:['Book licensed houseboats for Alleppey backwaters.','Choose government-certified Ayurveda centres.','Carry rain gear if visiting during monsoon.','Ferries are the most scenic way to explore backwaters.'],
+    lat:10.8505, lng:76.2711,
+    vrImages:[
+'https://www.360cities.net/image/kerala-backwaters-india'
+]
+  },
+  {
+    name:'Hampi', costPerDay:2000, category:'heritage',
+    sub:'Karnataka – UNESCO World Heritage Site of ancient ruins',
+    img:'https://images.unsplash.com/photo-1689946727963-be60e05fe278?q=80&w=1600&auto=format&fit=crop',
+    desc:'Hampi is an ancient village once the capital of the powerful Vijayanagara Empire. Today it is a UNESCO World Heritage Site, renowned for vast ruins, temples, royal enclosures, and unique boulder-strewn landscapes along the Tungabhadra River.',
+    places:['Virupaksha Temple','Vittala Temple & Stone Chariot','Lotus Mahal','Hampi Bazaar','Elephant Stables','Matanga Hill (sunrise)','Hemakuta Hill'],
+    best:'October to February; summers are intensely hot.',
+    famous:'Ancient Vijayanagara ruins, Dravidian temple architecture, surreal boulder landscape.',
+    food:'South Indian vegetarian thali, dosa, local café international food for backpackers.',
+    rail:['Hospet Junction (~13 km away)'],
+    reach:'Nearest airport is Hubli (~165 km). Overnight buses from Bangalore are popular.',
+    tips:['Wear sturdy walking shoes — the terrain is very uneven.','Hire an official guide to appreciate the historical depth.','Visit Matanga Hill for the best sunrise panorama.','Do not climb or damage ancient structures.'],
+    lat:15.3350, lng:76.4600,
+    vrImages:[
+'https://www.360cities.net/image/hampi-virupaksha-temple-india'
+]
+  },
+  {
+    name:'Udaipur', costPerDay:3200, category:'heritage',
+    sub:'Rajasthan – City of Lakes and royal palaces',
+    img:'https://images.unsplash.com/photo-1589901164570-f9de6556e1c1?q=80&w=1600&auto=format&fit=crop',
+    desc:'Udaipur, the "City of Lakes," is one of the most romantic cities in Rajasthan. Founded in 1559 by Maharana Udai Singh II, it was the historic capital of the Mewar kingdom. Surrounded by the Aravalli hills, it features stunning palace architecture reflected in the shimmering waters of Lake Pichola and Fateh Sagar.',
+    places:['City Palace','Lake Pichola','Jag Mandir','Jag Niwas (Lake Palace)','Fateh Sagar Lake','Saheliyon Ki Bari','Bagore Ki Haveli','Sajjangarh (Monsoon Palace)'],
+    best:'September to March; monsoons add charm to the lakes.',
+    famous:'Scenic lakes, royal palaces, heritage hotels, romantic boat cruises, Mewar history.',
+    food:'Dal baati churma, gatte ki sabzi, Rajasthani thali, kachori, lakeside café food.',
+    rail:['Udaipur City Railway Station'],
+    reach:'Maharana Pratap Airport with flights from Delhi, Mumbai, Jaipur. Overnight trains from Delhi.',
+    tips:['Evening boat rides on Lake Pichola offer the best palace views.','Visit City Palace early — it\'s vast and takes 3-4 hours.','Pre-book heritage hotels during peak season.','Buy handicrafts from government-authorized stores.'],
+    lat:24.5854, lng:73.7125,
+    vrImages:[
+'https://www.360cities.net/image/udaipur-city-palace-india'
+]
+  }
+];
+
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+let leafletMap = null;
+let leafletMarker = null;
+let vrImageIndex = 0;
+let currentCity = null;
+let wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+let itinerary = JSON.parse(localStorage.getItem('itinerary') || '[]');
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', () => {
+  renderCities(CITIES);
+  populateBudgetDropdown();
+  renderItinerary();
+
+  document.getElementById('searchInput').addEventListener('input', filterCards);
+  document.getElementById('filterSelect').addEventListener('change', filterCards);
+});
+
+/* ═══════════════════════════════════════════
+   RENDER DESTINATION CARDS
+═══════════════════════════════════════════ */
+function renderCities(data) {
+  const grid = document.getElementById('grid');
+  if (!data.length) {
+    grid.innerHTML = '<p style="color:var(--muted);grid-column:1/-1;text-align:center;padding:40px">No destinations found.</p>';
+    return;
+  }
+  grid.innerHTML = data.map(city => `
+    <div class="dest-card" onclick="openModal('${city.name}')">
+      <div class="dest-image" style="background-image:url('${city.img}')">
+        <span class="dest-badge">${capFirst(city.category)}</span>
+      </div>
+      <div class="dest-content">
+        <h3 class="dest-title">${city.name}</h3>
+        <p class="dest-sub">${city.sub}</p>
+        <button class="btn" onclick="event.stopPropagation();openModal('${city.name}')">🥽 Explore 360°</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function capFirst(s){ return s ? s[0].toUpperCase()+s.slice(1) : ''; }
+
+function filterCards() {
+  const q   = document.getElementById('searchInput').value.toLowerCase();
+  const cat = document.getElementById('filterSelect').value;
+  renderCities(CITIES.filter(c =>
+    (cat === 'all' || c.category === cat) &&
+    (c.name.toLowerCase().includes(q) || c.sub.toLowerCase().includes(q))
+  ));
+}
+
+/* ═══════════════════════════════════════════
+   MODAL – OPEN / CLOSE
+═══════════════════════════════════════════ */
+function openModal(name) {
+  currentCity = CITIES.find(c => c.name === name);
+  if (!currentCity) return;
+
+  const c = currentCity;
+  document.getElementById('modal').classList.add('open');
+  document.getElementById('mTitle').textContent = c.name;
+  document.getElementById('mSub').textContent   = c.sub;
+  document.getElementById('mDesc').textContent  = c.desc;
+  document.getElementById('mBest').textContent  = c.best;
+  document.getElementById('mFamous').textContent= c.famous;
+  document.getElementById('mFood').textContent  = c.food;
+  document.getElementById('mReach').textContent = c.reach || '—';
+
+  document.getElementById('mPlaces').innerHTML = c.places.map(p=>`<li>📍 ${p}</li>`).join('');
+  document.getElementById('mRail').innerHTML   = c.rail.map(r=>`<li>🚆 ${r}</li>`).join('');
+  document.getElementById('mTips').innerHTML   = c.tips.map(t=>`<li>💡 ${t}</li>`).join('');
+
+  // VR
+  vrImageIndex = 0;
+  loadVRScene(c);
+
+  // Map
+  initMap(c.lat, c.lng, c.name);
+
+  // Weather
+  fetchWeather(c.lat, c.lng);
+
+  // Wishlist button
+  renderWishlistCard(c.name);
+
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow = '';
+  // Destroy A-Frame scene to free memory
+  const vr = document.getElementById('vrContainer');
+  vr.innerHTML = '<div class="vr-label">🥽 360° Immersive View – drag to look around</div><div class="vr-controls"><button class="btn btn-dark" id="vrPrevBtn" onclick="cycleVR(-1)" style="padding:6px 10px;font-size:.75rem">◀ Prev</button><button class="btn btn-dark" id="vrNextBtn" onclick="cycleVR(1)" style="padding:6px 10px;font-size:.75rem">Next ▶</button></div>';
+  leafletMap = null;
+}
+
+/* ═══════════════════════════════════════════
+   360° VR
+═══════════════════════════════════════════ */
+function loadVRScene(city) {
+  const tours = city.vrTours || [];
+  if (!tours.length) return;
+
+  const tour = tours[vrImageIndex % tours.length];
+  const cont = document.getElementById('vrContainer');
+
+  cont.innerHTML = `
+    <div class="vr-label">
+      🥽 ${tour.title}
+    </div>
+
+    <iframe
+      src="${tour.url}"
+      width="100%"
+      height="100%"
+      style="border:none;border-radius:16px;"
+      allowfullscreen
+      loading="lazy">
+    </iframe>
+
+    <div class="vr-controls">
+      <button class="btn btn-dark btn-sm" onclick="cycleVR(-1)">◀</button>
+      <button class="btn btn-dark btn-sm" onclick="cycleVR(1)">▶</button>
+    </div>
+  `;
+}
+
+function cycleVR(dir){
+  if(!currentCity || !currentCity.vrTours) return;
+
+  vrImageIndex =
+    (vrImageIndex + dir + currentCity.vrTours.length)
+    % currentCity.vrTours.length;
+
+  loadVRScene(currentCity);
+}
+
+/* ═══════════════════════════════════════════
+   LEAFLET MAP
+═══════════════════════════════════════════ */
+function initMap(lat, lng, name) {
+  const mapEl = document.getElementById('map');
+  mapEl.innerHTML = '';
+
+  // Need a small delay because modal just opened
+  setTimeout(() => {
+    if (leafletMap) { leafletMap.remove(); leafletMap = null; }
+    leafletMap = L.map('map', { zoomControl: true }).setView([lat, lng], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution:'© OpenStreetMap contributors'
+    }).addTo(leafletMap);
+    L.marker([lat, lng]).addTo(leafletMap).bindPopup(`<b>${name}</b>`).openPopup();
+  }, 350);
+}
+
+/* ═══════════════════════════════════════════
+   WEATHER  (Open-Meteo – free, no key needed)
+═══════════════════════════════════════════ */
+async function fetchWeather(lat, lng) {
+  const el = document.getElementById('weatherContent');
+  el.innerHTML = '<p class="weather-desc">Fetching current weather…</p>';
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true&hourly=relative_humidity_2m&timezone=auto`;
+    const res  = await fetch(url);
+    const data = await res.json();
+    const w    = data.current_weather;
+    const code = w.weathercode;
+    const icon = weatherIcon(code);
+    const desc = weatherDesc(code);
+    el.innerHTML = `
+      <div class="weather-row">
+        <span class="weather-icon">${icon}</span>
+        <span class="weather-temp">${w.temperature}°C</span>
+      </div>
+      <p class="weather-desc">${desc} · Wind ${w.windspeed} km/h</p>
+      <p class="weather-desc" style="margin-top:4px;font-size:.75rem;opacity:.6">Via Open-Meteo (live data)</p>
+    `;
+  } catch {
+    el.innerHTML = '<p class="weather-desc">Could not load weather data.</p>';
+  }
+}
+
+function weatherIcon(code) {
+  if (code === 0) return '☀️';
+  if (code <= 3)  return '⛅';
+  if (code <= 49) return '🌫️';
+  if (code <= 67) return '🌧️';
+  if (code <= 77) return '❄️';
+  if (code <= 82) return '🌦️';
+  return '⛈️';
+}
+function weatherDesc(code) {
+  if (code === 0) return 'Clear sky';
+  if (code <= 3)  return 'Partly cloudy';
+  if (code <= 49) return 'Foggy / Hazy';
+  if (code <= 67) return 'Rainy';
+  if (code <= 77) return 'Snow';
+  if (code <= 82) return 'Showers';
+  return 'Thunderstorm';
+}
+
+/* ═══════════════════════════════════════════
+   WISHLIST
+═══════════════════════════════════════════ */
+function renderWishlistCard(name) {
+  const ul = document.getElementById('wishlistList');
+  ul.innerHTML = wishlist.length
+    ? wishlist.map(w => `<li>❤️ ${w}</li>`).join('')
+    : '<li class="wish-empty" style="border:none;background:none;color:var(--muted);font-style:italic">No wishlist items yet.</li>';
+}
+
+function toggleWishlist() {
+  if (!currentCity) return;
+  const name = currentCity.name;
+  const idx  = wishlist.indexOf(name);
+  if (idx === -1) wishlist.push(name);
+  else wishlist.splice(idx, 1);
+  localStorage.setItem('wishlist', JSON.stringify(wishlist));
+  renderWishlistCard(name);
+}
+
+/* ═══════════════════════════════════════════
+   ITINERARY
+═══════════════════════════════════════════ */
+function addDay() {
+  const title   = document.getElementById('dayTitle').value.trim();
+  const details = document.getElementById('dayDetails').value.trim();
+  if (!title) return alert('Please enter a day title.');
+  itinerary.push({ title, details });
+  localStorage.setItem('itinerary', JSON.stringify(itinerary));
+  renderItinerary();
+  document.getElementById('dayTitle').value   = '';
+  document.getElementById('dayDetails').value = '';
+}
+
+function renderItinerary() {
+  const el = document.getElementById('itineraryDays');
+  el.innerHTML = itinerary.length
+    ? itinerary.map((d, i) => `
+        <div class="itin-day">
+          <h4>${d.title} <button onclick="removeDay(${i})" style="float:right;background:none;border:none;color:var(--orange);cursor:pointer;font-size:.8rem">✕ Remove</button></h4>
+          ${d.details ? `<p>${d.details}</p>` : ''}
+        </div>
+      `).join('')
+    : '<p style="color:var(--muted);font-size:.85rem">No itinerary days added yet.</p>';
+}
+
+function removeDay(i) {
+  itinerary.splice(i, 1);
+  localStorage.setItem('itinerary', JSON.stringify(itinerary));
+  renderItinerary();
+}
+
+function clearItinerary() {
+  if (!confirm('Clear entire itinerary?')) return;
+  itinerary = [];
+  localStorage.removeItem('itinerary');
+  renderItinerary();
+}
+
+function addCurrentToItinerary() {
+  if (!currentCity) return;
+  document.getElementById('dayTitle').value = `Day ${itinerary.length + 1}: Visit ${currentCity.name}`;
+  closeModal();
+  setTimeout(() => document.getElementById('dayTitle').scrollIntoView({ behavior:'smooth' }), 300);
+}
+
+/* ═══════════════════════════════════════════
+   BUDGET PLANNER
+═══════════════════════════════════════════ */
+function populateBudgetDropdown() {
+  const sel = document.getElementById('budgetPlace');
+  CITIES.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.name;
+    opt.textContent = `${c.name} (₹${c.costPerDay}/day)`;
+    sel.appendChild(opt);
+  });
+}
+
+function searchBudgetPlace() {
+  const name = document.getElementById('budgetPlace').value;
+  if (!name) {
+    alert('Please select a destination to search.');
+    return;
+  }
+  const city = CITIES.find(c => c.name === name);
+  if (!city) {
+    alert('Destination not found.');
+    return;
+  }
+  openModal(name);
+}
+
+function calculateBudget() {
+  const name    = document.getElementById('budgetPlace').value;
+  const people  = parseInt(document.getElementById('people').value);
+  const days    = parseInt(document.getElementById('days').value);
+  const el      = document.getElementById('budgetResult');
+
+  if (!name || !people || !days) {
+    el.innerHTML = '<span style="color:#f87171">Please fill all fields.</span>';
+    return;
+  }
+  const city    = CITIES.find(c => c.name === name);
+  const base    = city.costPerDay * people * days;
+  const travel  = Math.round(base * 0.3);
+  const hotel   = Math.round(base * 0.4);
+  const food    = Math.round(base * 0.2);
+  const misc    = Math.round(base * 0.1);
+  const total   = base + travel;
+
+  el.innerHTML = `
+    <div style="margin-top:12px;border-top:1px solid rgba(255,255,255,.1);padding-top:12px">
+      <p>🏨 Accommodation &nbsp;&nbsp;<b>₹${hotel.toLocaleString()}</b></p>
+      <p>✈️ Travel &nbsp;&nbsp;<b>₹${travel.toLocaleString()}</b></p>
+      <p>🍽 Food &nbsp;&nbsp;<b>₹${food.toLocaleString()}</b></p>
+      <p>🎒 Misc &nbsp;&nbsp;<b>₹${misc.toLocaleString()}</b></p>
+      <hr style="border-color:rgba(255,255,255,.1);margin:10px 0">
+      <p style="font-size:1.1rem;color:var(--orange);font-weight:600">
+        💰 Estimated Total: ₹${total.toLocaleString()}
+      </p>
+      <p style="font-size:.75rem;color:var(--muted);margin-top:6px">
+        Based on ₹${city.costPerDay}/day · ${people} people · ${days} days (indicative)
+      </p>
+    </div>
+  `;
+}
+</script>
+</body>
+</html>

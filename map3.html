@@ -1,0 +1,1143 @@
+cat > /mnt/user-data/outputs/index.html << 'HTMLEOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discover India – 360° VR Travel</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    :root{
+      --orange:#f97316;--orange2:#ea580c;--dark:#020617;
+      --card:#0f172a;--card2:#1e293b;--text:#e2e8f0;--muted:#94a3b8;
+    }
+    body{font-family:'Poppins',sans-serif;background:linear-gradient(135deg,#0f172a,#1e293b);padding:24px;min-height:100vh;}
+    .page{max-width:1500px;margin:auto;background:var(--dark);border-radius:22px;overflow:hidden;}
+
+    /* HERO */
+    .top-hero{position:relative;padding:90px 70px 70px;color:white;background:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1600') center/cover no-repeat;overflow:hidden;}
+    .top-hero::before{content:'';position:absolute;inset:0;background:linear-gradient(to bottom right,rgba(2,6,23,.7),rgba(249,115,22,.2));}
+    .top-hero>*{position:relative;z-index:1;}
+    .hero-title{font-family:'Playfair Display',serif;font-size:3.4rem;line-height:1.1;}
+    .hero-sub{margin-top:10px;color:rgba(255,255,255,.75);font-size:.95rem;}
+
+    /* SECTION */
+    .section{padding:40px;color:var(--text);}
+    .section h2{font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:22px;color:var(--orange);}
+
+    /* CONTROLS */
+    .controls{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;}
+    .controls input,.controls select{padding:12px 16px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:var(--card);color:var(--text);font-family:'Poppins',sans-serif;font-size:.9rem;flex:1;min-width:160px;outline:none;transition:border-color .2s;}
+    .controls input:focus,.controls select:focus{border-color:var(--orange);}
+    .controls select option{background:var(--card);}
+
+    /* DESTINATION GRID */
+    .dest-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:22px;}
+    .dest-card{background:var(--card);border-radius:18px;overflow:hidden;transition:transform .3s,box-shadow .3s;border:1px solid rgba(255,255,255,.05);cursor:pointer;}
+    .dest-card:hover{transform:translateY(-7px);box-shadow:0 18px 40px rgba(0,0,0,.5);}
+    .dest-image{height:200px;background-size:cover;background-position:center;position:relative;}
+    .dest-badge{position:absolute;top:10px;right:10px;background:rgba(249,115,22,.9);color:white;font-size:.7rem;font-weight:600;padding:3px 8px;border-radius:20px;}
+    .dest-content{padding:18px;}
+    .dest-title{font-family:'Playfair Display',serif;font-size:1.3rem;color:white;}
+    .dest-sub{color:var(--muted);margin:8px 0 14px;font-size:.82rem;}
+
+    /* BUTTONS */
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border:none;border-radius:12px;background:var(--orange);color:white;cursor:pointer;font-family:'Poppins',sans-serif;font-size:.85rem;font-weight:500;transition:background .2s,transform .15s;}
+    .btn:hover{background:var(--orange2);transform:scale(1.03);}
+    .btn-ghost{background:transparent;border:1.5px solid var(--orange);color:var(--orange);}
+    .btn-ghost:hover{background:var(--orange);color:white;}
+    .btn-dark{background:#1e293b;color:white;}
+    .btn-dark:hover{background:#334155;transform:scale(1.03);}
+    .btn-sm{padding:7px 12px;font-size:.78rem;}
+
+    /* CARDS */
+    .card{background:var(--card2);padding:20px;border-radius:14px;margin-bottom:20px;}
+    .card h3{color:var(--orange);margin-bottom:10px;font-size:1rem;}
+    .card p{font-size:.88rem;line-height:1.7;color:var(--muted);}
+    ul{list-style:none;}
+    li{background:var(--card);margin-bottom:8px;padding:9px 12px;border-left:4px solid var(--orange);border-radius:8px;font-size:.84rem;color:var(--text);}
+
+    /* ITINERARY */
+    #itineraryDays .itin-day{background:var(--card);border-left:4px solid var(--orange);border-radius:12px;padding:14px 18px;margin-bottom:12px;}
+    #itineraryDays .itin-day h4{color:white;margin-bottom:6px;font-size:.95rem;}
+    #itineraryDays .itin-day p{color:var(--muted);font-size:.82rem;white-space:pre-line;}
+    .card-form input,.card-form textarea{width:100%;padding:10px 14px;border:1px solid rgba(255,255,255,.1);border-radius:10px;background:var(--card2);color:var(--text);font-family:'Poppins',sans-serif;font-size:.88rem;margin-bottom:10px;outline:none;resize:vertical;}
+    .card-form textarea{min-height:90px;}
+    .card-form input:focus,.card-form textarea:focus{border-color:var(--orange);}
+
+    /* BUDGET */
+    .budget-box{background:var(--card);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px;max-width:500px;}
+    .budget-box select,.budget-box input{padding:11px 14px;border:1px solid rgba(255,255,255,.1);border-radius:10px;background:var(--card2);color:var(--text);font-family:'Poppins',sans-serif;font-size:.88rem;outline:none;}
+    .budget-box select option{background:var(--card);}
+
+    /* ── MODAL ── */
+    .modal{position:fixed;inset:0;display:none;justify-content:center;align-items:flex-start;padding:30px 16px;background:rgba(0,0,0,.88);overflow-y:auto;z-index:900;}
+    .modal.open{display:flex;}
+    .modal-card{width:100%;max-width:1200px;background:var(--card);border-radius:20px;overflow:hidden;color:var(--text);}
+    .modal-head{padding:22px 26px;background:linear-gradient(90deg,var(--orange),var(--orange2));color:white;display:flex;justify-content:space-between;align-items:center;}
+    .modal-head h2{font-family:'Playfair Display',serif;font-size:1.6rem;}
+    .modal-head p{font-size:.82rem;opacity:.85;margin-top:3px;}
+    .modal-body{padding:26px;display:grid;grid-template-columns:1fr 360px;gap:22px;}
+    .details-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+    /* MODAL TABS */
+    .tab-bar{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+    .tab-btn{padding:8px 18px;border:1.5px solid rgba(255,255,255,.15);border-radius:30px;background:transparent;color:var(--muted);cursor:pointer;font-family:'Poppins',sans-serif;font-size:.82rem;transition:.2s;}
+    .tab-btn.active{background:var(--orange);border-color:var(--orange);color:white;}
+    .tab-pane{display:none;}
+    .tab-pane.active{display:block;}
+
+    /* VR */
+    #vrContainer{height:420px;border-radius:16px;overflow:hidden;margin-bottom:20px;background:#000;position:relative;}
+    .vr-label{position:absolute;top:10px;left:12px;background:rgba(249,115,22,.85);color:white;font-size:.72rem;font-weight:600;padding:4px 10px;border-radius:20px;z-index:10;pointer-events:none;}
+    .vr-controls{position:absolute;bottom:10px;right:10px;display:flex;gap:8px;z-index:10;}
+
+    /* MAP */
+    #map{height:200px;border-radius:12px;overflow:hidden;margin-bottom:20px;}
+
+    /* ── HOTELS SECTION ── */
+    .hotels-search-bar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+    .hotels-search-bar input{flex:1;padding:10px 14px;border:1px solid rgba(255,255,255,.1);border-radius:10px;background:var(--card2);color:var(--text);font-family:'Poppins',sans-serif;font-size:.85rem;outline:none;}
+    .hotels-search-bar input:focus{border-color:var(--orange);}
+    .hotel-cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
+    .hotel-card{background:var(--card);border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.06);transition:.25s;}
+    .hotel-card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,.4);}
+    .hotel-card-img{height:150px;background:var(--card2);position:relative;overflow:hidden;}
+    .hotel-card-img img{width:100%;height:100%;object-fit:cover;}
+    .hotel-card-body{padding:14px;}
+    .hotel-card-name{font-weight:600;color:white;font-size:.9rem;margin-bottom:6px;}
+    .hotel-card-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+    .hotel-chip{background:var(--card2);color:var(--muted);font-size:.72rem;padding:3px 8px;border-radius:20px;}
+    .hotel-chip.green{background:rgba(34,197,94,.15);color:#4ade80;}
+    .hotel-chip.yellow{background:rgba(251,191,36,.15);color:#fbbf24;}
+
+    /* Hotel VR Modal */
+    .hotel-vr-overlay{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:1100;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
+    .hotel-vr-overlay.open{display:flex;}
+    .hotel-vr-inner{width:100%;max-width:900px;border-radius:18px;overflow:hidden;background:#000;position:relative;}
+    .hotel-vr-inner>a-scene{height:500px;width:100%;}
+    .hotel-vr-close{position:absolute;top:14px;right:14px;z-index:10;background:rgba(0,0,0,.7);color:white;border:none;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;}
+    .hotel-vr-info{color:white;margin-top:16px;text-align:center;}
+    .hotel-vr-info h3{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:6px;}
+    .hotel-vr-info p{color:var(--muted);font-size:.85rem;}
+
+    /* ── CHATBOT ── */
+    #chatBtn{position:fixed;bottom:28px;right:28px;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--orange),var(--orange2));border:none;cursor:pointer;z-index:1050;box-shadow:0 4px 20px rgba(249,115,22,.5);font-size:1.5rem;color:white;display:flex;align-items:center;justify-content:center;transition:transform .2s;}
+    #chatBtn:hover{transform:scale(1.1);}
+    #chatWindow{position:fixed;bottom:100px;right:28px;width:360px;max-height:520px;background:var(--card);border-radius:20px;z-index:1050;box-shadow:0 20px 60px rgba(0,0,0,.6);display:none;flex-direction:column;overflow:hidden;border:1px solid rgba(255,255,255,.08);}
+    #chatWindow.open{display:flex;}
+    .chat-head{padding:16px 20px;background:linear-gradient(90deg,var(--orange),var(--orange2));color:white;display:flex;justify-content:space-between;align-items:center;}
+    .chat-head h4{font-size:.95rem;font-weight:600;}
+    .chat-head span{font-size:.75rem;opacity:.8;}
+    .chat-close{background:none;border:none;color:white;font-size:1.1rem;cursor:pointer;}
+    .chat-messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:280px;max-height:340px;}
+    .chat-bubble{max-width:82%;padding:10px 14px;border-radius:14px;font-size:.83rem;line-height:1.55;}
+    .chat-bubble.bot{background:var(--card2);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px;}
+    .chat-bubble.user{background:var(--orange);color:white;align-self:flex-end;border-bottom-right-radius:4px;}
+    .chat-bubble.typing{background:var(--card2);color:var(--muted);font-style:italic;}
+    .chat-input-row{display:flex;gap:8px;padding:12px;border-top:1px solid rgba(255,255,255,.07);}
+    .chat-input-row input{flex:1;padding:9px 13px;border:1px solid rgba(255,255,255,.1);border-radius:10px;background:var(--card2);color:var(--text);font-family:'Poppins',sans-serif;font-size:.83rem;outline:none;}
+    .chat-input-row input:focus{border-color:var(--orange);}
+    .chat-send{background:var(--orange);border:none;color:white;width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.2s;}
+    .chat-send:hover{background:var(--orange2);}
+
+    /* WEATHER */
+    .weather-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+    .weather-icon{font-size:1.6rem;}
+    .weather-temp{font-size:1.4rem;font-weight:600;color:white;}
+
+    /* RESPONSIVE */
+    @media(max-width:900px){.modal-body{grid-template-columns:1fr;}.details-grid{grid-template-columns:1fr;}.hero-title{font-size:2.2rem;}}
+    @media(max-width:600px){.top-hero{padding:50px 24px;}.section{padding:24px;}#chatWindow{width:95%;right:2.5%;}#chatBtn{bottom:16px;right:16px;}}
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- HERO -->
+  <header class="top-hero">
+    <h1 class="hero-title">TravelVerse</h1>
+    <p class="hero-sub">360° immersive views · Live weather · Hotels · AI travel assistant</p>
+  </header>
+
+  <!-- DESTINATIONS -->
+  <section class="section">
+    <h2>✈️ Popular Destinations</h2>
+    <div class="controls">
+      <input type="text" id="searchInput" placeholder="🔍 Search destination…">
+      <select id="filterSelect">
+        <option value="all">All Categories</option>
+        <option value="heritage">Heritage</option>
+        <option value="beach">Beach</option>
+        <option value="hill">Hill Station</option>
+        <option value="spiritual">Spiritual</option>
+        <option value="metro">Metro City</option>
+        <option value="nature">Nature</option>
+      </select>
+    </div>
+    <div class="dest-grid" id="grid"></div>
+  </section>
+
+  <!-- ITINERARY -->
+  <section class="section">
+    <h2>🧳 My Itinerary</h2>
+    <div class="card card-form">
+      <input id="dayTitle" placeholder="Day 1: Haridwar to Barkot">
+      <textarea id="dayDetails" placeholder="• Morning drive&#10;• Scenic views&#10;• Overnight stay"></textarea>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" onclick="addDay()">➕ Add Day</button>
+        <button class="btn btn-ghost" onclick="clearItinerary()">🗑 Clear</button>
+      </div>
+    </div>
+    <div id="itineraryDays"></div>
+  </section>
+
+  <!-- BUDGET -->
+  <section class="section">
+    <h2>💰 Smart Budget Planner</h2>
+    <div class="budget-box">
+      <select id="budgetPlace"><option value="">— Select Destination —</option></select>
+      <input type="number" id="people" placeholder="Number of people" min="1">
+      <input type="number" id="days2" placeholder="Number of days" min="1">
+      <button class="btn" onclick="calculateBudget()">Calculate Budget</button>
+      <div id="budgetResult"></div>
+    </div>
+  </section>
+
+</div><!-- /.page -->
+
+<!-- ─── DESTINATION MODAL ─── -->
+<div class="modal" id="modal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div><h2 id="mTitle"></h2><p id="mSub"></p></div>
+      <button class="btn btn-dark" onclick="closeModal()">✕ Close</button>
+    </div>
+    <div class="modal-body">
+      <!-- LEFT -->
+      <div>
+        <!-- Tabs -->
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="switchTab('overview')">🗺 Overview</button>
+          <button class="tab-btn" onclick="switchTab('hotels')">🏨 Nearby Hotels</button>
+          <button class="tab-btn" onclick="switchTab('attractions')">🎯 Attractions</button>
+        </div>
+
+        <!-- OVERVIEW TAB -->
+        <div class="tab-pane active" id="tab-overview">
+          <div id="vrContainer">
+            <div class="vr-label">🥽 360° View – drag to look around</div>
+            <div class="vr-controls">
+              <button class="btn btn-dark btn-sm" onclick="cycleVR(-1)">◀</button>
+              <button class="btn btn-dark btn-sm" onclick="cycleVR(1)">▶</button>
+            </div>
+          </div>
+          <div id="map"></div>
+          <div class="card"><h3>About</h3><p id="mDesc"></p></div>
+          <div class="card"><h3>🗺 Places to Visit</h3><ul id="mPlaces"></ul></div>
+          <div class="details-grid">
+            <div class="card"><h3>🗓 Best Time</h3><p id="mBest"></p></div>
+            <div class="card"><h3>🌟 Famous For</h3><p id="mFamous"></p></div>
+            <div class="card"><h3>🍽 Local Food</h3><p id="mFood"></p></div>
+            <div class="card"><h3>🚗 How to Reach</h3><p id="mReach"></p></div>
+          </div>
+        </div>
+
+        <!-- HOTELS TAB -->
+        <div class="tab-pane" id="tab-hotels">
+          <div class="hotels-search-bar">
+            <input type="text" id="hotelSearchInput" placeholder="Search hotels in this city…">
+            <button class="btn btn-sm" onclick="triggerHotelSearch()">Search</button>
+            <button class="btn btn-ghost btn-sm" onclick="loadNearbyHotels()">📍 Nearby</button>
+          </div>
+          <div id="hotelCardsGrid" class="hotel-cards-grid">
+            <p style="color:var(--muted);font-size:.85rem;grid-column:1/-1">Click "Nearby" to load hotels around this destination.</p>
+          </div>
+        </div>
+
+        <!-- ATTRACTIONS TAB -->
+        <div class="tab-pane" id="tab-attractions">
+          <div id="attractionCardsGrid" class="hotel-cards-grid">
+            <p style="color:var(--muted);font-size:.85rem;grid-column:1/-1">
+              <button class="btn btn-sm" onclick="loadNearbyAttractions()">📍 Load Nearby Attractions</button>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div>
+        <div class="card">
+          <h3>🌦 Current Weather</h3>
+          <div id="weatherContent"><p style="color:var(--muted);font-size:.85rem">Loading…</p></div>
+        </div>
+        <div class="card"><h3>🚆 Nearest Railway Station</h3><ul id="mRail"></ul></div>
+        <div class="card"><h3>🧠 Travel Tips</h3><ul id="mTips"></ul></div>
+        <div class="card">
+          <h3>❤️ Wishlist</h3>
+          <ul id="wishlistList"></ul>
+          <button class="btn btn-sm" style="margin-top:10px" onclick="toggleWishlist()">Toggle Wishlist</button>
+        </div>
+        <div class="card">
+          <h3>📋 Quick Add to Itinerary</h3>
+          <button class="btn btn-ghost btn-sm" onclick="addCurrentToItinerary()">➕ Add Destination</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── HOTEL 360° VR OVERLAY ─── -->
+<div class="hotel-vr-overlay" id="hotelVrOverlay">
+  <div class="hotel-vr-inner" id="hotelVrInner">
+    <button class="hotel-vr-close" onclick="closeHotelVR()">✕</button>
+  </div>
+  <div class="hotel-vr-info">
+    <h3 id="hotelVrName"></h3>
+    <p id="hotelVrDesc"></p>
+  </div>
+</div>
+
+<!-- ─── CHATBOT ─── -->
+<button id="chatBtn" onclick="toggleChat()" title="AI Travel Assistant">🤖</button>
+
+<div id="chatWindow">
+  <div class="chat-head">
+    <div>
+      <h4>🤖 Travel Assistant</h4>
+      <span>Ask me anything about India travel!</span>
+    </div>
+    <button class="chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chat-messages" id="chatMessages"></div>
+  <div class="chat-input-row">
+    <input type="text" id="chatInput" placeholder="Ask about hotels, weather, tips…" onkeydown="if(event.key==='Enter')sendChat()">
+    <button class="chat-send" onclick="sendChat()">➤</button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+/* ══════════════════════════════════
+   DATA
+══════════════════════════════════ */
+const CITIES=[
+  {
+    name:'Agra',
+    costPerDay:2500,
+    category:'heritage',
+    sub:'Uttar Pradesh – City of the Taj Mahal',
+    img:'https://images.unsplash.com/photo-1564507592333-c60657eea523',
+    desc:'Agra, on the banks...',
+    places:['Taj Mahal','Agra Fort'],
+    best:'October to March',
+    famous:'Mughal architecture',
+    food:'Petha',
+    rail:['Agra Cantt'],
+    reach:'Delhi via Yamuna Expressway',
+    tips:['Pre-book Taj tickets'],
+    lat:27.1767,
+    lng:78.0081,
+    vrTours:[
+      {
+        title:'Taj Mahal VR',
+        type:'iframe',
+        url:'https://www.airpano.com/360photo/india-taj-mahal/'
+      },
+      {
+        title:'Agra Fort VR',
+        type:'iframe',
+        url:'https://www.360cities.net/image/taj-mahal-india'
+      }
+    ]
+  },
+  {
+  name:'Jaipur',
+  costPerDay:3000,
+  category:'heritage',
+  sub:'Rajasthan – The Pink City',
+  img:'https://images.unsplash.com/photo-1602339752474-f77aa7bcaecd?q=80&w=1600',
+  desc:'Jaipur, capital of Rajasthan, is the Pink City – one of India\'s first planned cities.',
+  places:['Amber Fort','Hawa Mahal','City Palace'],
+  best:'October to March',
+  famous:'Pink City architecture',
+  food:'Dal Baati Churma',
+  rail:['Jaipur Junction'],
+  reach:'Jaipur International Airport',
+  tips:['Visit Amber Fort early'],
+  lat:26.9124,
+  lng:75.7873,
+  vrTours:[
+    {
+      title:'Amber Fort VR',
+      type:'iframe',
+      url:'https://www.airpano.com/360photo/india-jaipur/'
+    },
+    {
+      title:'Hawa Mahal VR',
+      type:'iframe',
+      url:'https://www.360cities.net/image/hawa-mahal-jaipur-india'
+    }
+  ]
+},
+{
+  name:'Goa',
+  costPerDay:3500,
+  category:'beach',
+  sub:'Beach Paradise – Sun, sand & nightlife',
+  img:'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?q=80&w=1600',
+  desc:'Goa is India\'s most popular beach destination with vibrant nightlife and beaches.',
+  places:['Baga Beach','Calangute Beach','Fort Aguada'],
+  best:'November to February',
+  famous:'Beaches & nightlife',
+  food:'Fish curry rice',
+  rail:['Madgaon Station'],
+  reach:'Dabolim Airport',
+  tips:['Helmet mandatory on rentals'],
+  lat:15.2993,
+  lng:74.1240,
+  vrTours:[
+    {
+      title:'Goa Beach VR',
+      type:'iframe',
+      url:'https://www.airpano.com/360photo/india-goa/'
+    },
+    {
+      title:'Baga Beach VR',
+      type:'iframe',
+      url:'https://www.360cities.net/image/goa-beach-india'
+    }
+  ]
+},
+{
+  name:'Manali',
+  costPerDay:3000,
+  category:'hill',
+  sub:'Himachal Pradesh – Adventure hub in the Himalayas',
+  img:'https://images.unsplash.com/photo-1706696435436-200ba23cda35?q=80&w=1600',
+  desc:'Manali is famous for snow mountains, adventure sports, and scenic valleys.',
+  places:['Solang Valley','Rohtang Pass','Hadimba Temple'],
+  best:'October to February',
+  famous:'Snow & adventure sports',
+  food:'Momos',
+  rail:['Chandigarh Railway Station'],
+  reach:'Bhuntar Airport',
+  tips:['Carry heavy woolens'],
+  lat:32.2396,
+  lng:77.1887,
+  vrTours:[
+    {
+      title:'Solang Valley VR',
+      type:'iframe',
+      url:'https://www.airpano.com/360photo/india-himalaya/'
+    },
+    {
+      title:'Himalayan Mountains VR',
+      type:'iframe',
+      url:'https://www.360cities.net/image/himalayas-india'
+    }
+  ]
+},
+{
+  name:'Varanasi',
+  costPerDay:2200,
+  category:'spiritual',
+  sub:'Uttar Pradesh – Spiritual capital on the Ganges',
+  img:'https://images.unsplash.com/photo-1561361513-2d000a50f0dc?q=80&w=1600',
+  desc:'Varanasi is one of the world\'s oldest living cities and spiritual heart of India.',
+  places:['Dashashwamedh Ghat','Kashi Vishwanath Temple'],
+  best:'October to March',
+  famous:'Ganga Aarti',
+  food:'Banarasi Paan',
+  rail:['Varanasi Junction'],
+  reach:'Lal Bahadur Shastri Airport',
+  tips:['Attend evening Ganga Aarti'],
+  lat:25.3176,
+  lng:82.9739,
+  vrTours:[
+    {
+      title:'Ganga Aarti VR',
+      type:'iframe',
+      url:'https://www.airpano.com/360photo/india-varanasi/'
+    },
+    {
+      title:'Varanasi Ghats VR',
+      type:'iframe',
+      url:'https://www.360cities.net/image/varanasi-india'
+    }
+  ]
+},
+{
+  name:'Delhi',
+  costPerDay:3500,
+  category:'metro',
+  sub:'Capital of India – Heritage & modern life',
+  img:'https://images.unsplash.com/photo-1587474260584-136574528ed5?q=80&w=1600',
+  desc:'Delhi blends Mughal heritage with modern city life.',
+  places:['Red Fort','India Gate','Qutub Minar'],
+  best:'October to March',
+  famous:'Historic monuments',
+  food:'Chole Bhature',
+  rail:['New Delhi Railway Station'],
+  reach:'IGI Airport',
+  tips:['Use Delhi Metro'],
+  lat:28.6139,
+  lng:77.2090,
+  vrTours:[
+    {
+      title:'Red Fort VR',
+      type:'iframe',
+      url:'https://www.airpano.com/360photo/india-delhi/'
+    },
+    {
+      title:'India Gate VR',
+      type:'iframe',
+      url:'https://www.360cities.net/image/india-gate-delhi'
+    }
+  ]
+},
+{
+  name:'Kerala',
+  costPerDay:3000,
+  category:'nature',
+  sub:"God's Own Country – Backwaters & greenery",
+  img:'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?q=80&w=1600',
+  desc:'Kerala offers serene backwaters, beaches, tea plantations, and Ayurveda.',
+  places:['Alleppey','Munnar','Wayanad'],
+  best:'September to March',
+  famous:'Backwaters & Ayurveda',
+  food:'Sadya',
+  rail:['Ernakulam Junction'],
+  reach:'Cochin International Airport',
+  tips:['Book houseboats early'],
+  lat:10.8505,
+  lng:76.2711,
+  vrTours:[
+    {
+      title:'Kerala Backwaters VR',
+      type:'iframe',
+      url:'https://www.airpano.com/360photo/india-kerala/'
+    },
+    {
+      title:'Alleppey Houseboat VR',
+      type:'iframe',
+      url:'https://www.360cities.net/image/kerala-backwaters'
+    }
+  ]
+},
+{
+  name:'Darjeeling',
+  costPerDay:2800,
+  category:'hill',
+  sub:'West Bengal – Tea paradise',
+  img:'https://images.unsplash.com/photo-1671711847762-b8308b444a42?q=80&w=1600',
+  desc:'Darjeeling is known for tea gardens, toy train, and Himalayan views.',
+  places:['Tiger Hill','Tea Gardens','Toy Train'],
+  best:'March to May',
+  famous:'Darjeeling Tea',
+  food:'Momos',
+  rail:['New Jalpaiguri'],
+  reach:'Bagdogra Airport',
+  tips:['Visit Tiger Hill before sunrise'],
+  lat:27.0360,
+  lng:88.2627,
+  vrTours:[
+    {
+      title:'Tiger Hill VR',
+      type:'iframe',
+      url:'https://www.airpano.com/360photo/india-darjeeling/'
+    },
+    {
+      title:'Tea Garden VR',
+      type:'iframe',
+      url:'https://www.360cities.net/image/darjeeling-india'
+    }
+  ]
+},
+{
+  name:'Hampi',
+  costPerDay:2000,
+  category:'heritage',
+  sub:'Karnataka – Ancient ruins & temples',
+  img:'https://images.unsplash.com/photo-1689946727963-be60e05fe278?q=80&w=1600',
+  desc:'Hampi is a UNESCO World Heritage Site with Vijayanagara ruins.',
+  places:['Virupaksha Temple','Stone Chariot'],
+  best:'October to February',
+  famous:'Ancient ruins',
+  food:'South Indian meals',
+  rail:['Hospet Junction'],
+  reach:'Hubli Airport',
+  tips:['Wear comfortable shoes'],
+  lat:15.3350,
+  lng:76.4600,
+  vrTours:[
+    {
+      title:'Hampi Ruins VR',
+      type:'iframe',
+      url:'https://www.airpano.com/360photo/india-hampi/'
+    },
+    {
+      title:'Stone Chariot VR',
+      type:'iframe',
+      url:'https://www.360cities.net/image/hampi-india'
+    }
+  ]
+},
+{
+  name:'Udaipur',
+  costPerDay:3200,
+  category:'heritage',
+  sub:'Rajasthan – City of Lakes',
+  img:'https://images.unsplash.com/photo-1589901164570-f9de6556e1c1?q=80&w=1600',
+  desc:'Udaipur is famous for lakes, palaces, and royal heritage.',
+  places:['City Palace','Lake Pichola','Jag Mandir'],
+  best:'September to March',
+  famous:'Lakes & palaces',
+  food:'Dal Baati Churma',
+  rail:['Udaipur City Station'],
+  reach:'Maharana Pratap Airport',
+  tips:['Take evening boat rides'],
+  lat:24.5854,
+  lng:73.7125,
+  vrTours:[
+    {
+      title:'Lake Pichola VR',
+      type:'iframe',
+      url:'https://www.airpano.com/360photo/india-udaipur/'
+    },
+    {
+      title:'City Palace VR',
+      type:'iframe',
+      url:'https://www.360cities.net/image/udaipur-india'
+    }
+  ]
+},
+];
+
+/* ══════════════════════════════════
+   HOTEL VR PANORAMAS
+   (curated free 360° Wikimedia images)
+══════════════════════════════════ */
+const HOTEL_VR_POOL = [
+  {
+    name:'Taj Palace Hotel',
+    vr:'https://www.youtube.com/embed/2MN_rjTtFbs'
+  },
+  {
+    name:'Oberoi Resort',
+    vr:'https://www.youtube.com/embed/1La4QzGeaaQ'
+  },
+  {
+    name:'Leela Palace',
+    vr:'https://www.youtube.com/embed/5qap5aO4i9A'
+  },
+  {
+    name:'ITC Grand',
+    vr:'https://www.youtube.com/embed/NpEaa2P7qZI'
+  },
+  {
+    name:'Marriott Goa',
+    vr:'https://www.youtube.com/embed/WC0nF8jPhZQ'
+  },
+  {
+    name:'Radisson Blu',
+    vr:'https://www.youtube.com/embed/aqz-KE-bpKQ'
+  }
+];
+/* ══════════════════════════════════
+   STATE
+══════════════════════════════════ */
+let leafletMap=null, vrImageIndex=0, currentCity=null;
+let wishlist=JSON.parse(localStorage.getItem('wishlist')||'[]');
+let itinerary=JSON.parse(localStorage.getItem('itinerary')||'[]');
+let chatHistory=[];
+
+/* ══════════════════════════════════
+   INIT
+══════════════════════════════════ */
+window.addEventListener('DOMContentLoaded',()=>{
+  renderCities(CITIES);
+  populateBudgetDropdown();
+  renderItinerary();
+  document.getElementById('searchInput').addEventListener('input',filterCards);
+  document.getElementById('filterSelect').addEventListener('change',filterCards);
+  addBotMessage("Hi! 👋 I'm your India travel assistant. Ask me about destinations, hotels, weather, food, or anything travel-related!");
+});
+
+/* ══════════════════════════════════
+   DESTINATION CARDS
+══════════════════════════════════ */
+function capFirst(s){return s?s[0].toUpperCase()+s.slice(1):'';}
+function renderCities(data){
+  const g=document.getElementById('grid');
+  if(!data.length){g.innerHTML='<p style="color:var(--muted);grid-column:1/-1;text-align:center;padding:40px">No destinations found.</p>';return;}
+  g.innerHTML=data.map(c=>`
+    <div class="dest-card" onclick="openModal('${c.name}')">
+      <div class="dest-image" style="background-image:url('${c.img}')">
+        <span class="dest-badge">${capFirst(c.category)}</span>
+      </div>
+      <div class="dest-content">
+        <h3 class="dest-title">${c.name}</h3>
+        <p class="dest-sub">${c.sub}</p>
+        <button class="btn" onclick="event.stopPropagation();openModal('${c.name}')">🥽 Explore 360°</button>
+      </div>
+    </div>`).join('');
+}
+function filterCards(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const cat=document.getElementById('filterSelect').value;
+  renderCities(CITIES.filter(c=>(cat==='all'||c.category===cat)&&(c.name.toLowerCase().includes(q)||c.sub.toLowerCase().includes(q))));
+}
+
+/* ══════════════════════════════════
+   MODAL
+══════════════════════════════════ */
+function openModal(name){
+  currentCity=CITIES.find(c=>c.name===name);
+  if(!currentCity)return;
+  const c=currentCity;
+  document.getElementById('modal').classList.add('open');
+  document.getElementById('mTitle').textContent=c.name;
+  document.getElementById('mSub').textContent=c.sub;
+  document.getElementById('mDesc').textContent=c.desc;
+  document.getElementById('mBest').textContent=c.best;
+  document.getElementById('mFamous').textContent=c.famous;
+  document.getElementById('mFood').textContent=c.food;
+  document.getElementById('mReach').textContent=c.reach||'—';
+  document.getElementById('mPlaces').innerHTML=c.places.map(p=>`<li>📍 ${p}</li>`).join('');
+  document.getElementById('mRail').innerHTML=c.rail.map(r=>`<li>🚆 ${r}</li>`).join('');
+  document.getElementById('mTips').innerHTML=c.tips.map(t=>`<li>💡 ${t}</li>`).join('');
+  vrImageIndex=0;
+  loadVRScene(c);
+  initMap(c.lat,c.lng,c.name);
+  fetchWeather(c.lat,c.lng);
+  renderWishlistCard(c.name);
+  switchTab('overview');
+  // Reset hotel/attraction grids
+  document.getElementById('hotelCardsGrid').innerHTML='<p style="color:var(--muted);font-size:.85rem;grid-column:1/-1">Click "Nearby" to load hotels around this destination.</p>';
+  document.getElementById('attractionCardsGrid').innerHTML='<p style="color:var(--muted);font-size:.85rem;grid-column:1/-1"><button class="btn btn-sm" onclick="loadNearbyAttractions()">📍 Load Nearby Attractions</button></p>';
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow='';
+  const vr=document.getElementById('vrContainer');
+  vr.innerHTML='<div class="vr-label">🥽 360° View – drag to look around</div><div class="vr-controls"><button class="btn btn-dark btn-sm" onclick="cycleVR(-1)">◀</button><button class="btn btn-dark btn-sm" onclick="cycleVR(1)">▶</button></div>';
+  leafletMap=null;
+}
+
+/* TABS */
+function switchTab(id){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  const idx=['overview','hotels','attractions'].indexOf(id);
+  document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+}
+
+/* ══════════════════════════════════
+   360° VR (iframe-based)
+══════════════════════════════════ */
+function loadVRScene(city){
+  const tours = city.vrTours || [];
+  if(!tours.length) return;
+
+  const tour = tours[vrImageIndex % tours.length];
+  const cont = document.getElementById('vrContainer');
+
+  cont.innerHTML = `
+    <div class="vr-label">
+      🥽 ${tour.title}
+    </div>
+
+    <iframe
+  src="${tour.url}"
+  width="100%"
+  height="500"
+  style="border:none;border-radius:16px;"
+  allowfullscreen
+  loading="lazy">
+</iframe>
+
+    <div class="vr-controls">
+      <button class="btn btn-dark btn-sm" onclick="cycleVR(-1)">◀</button>
+      <button class="btn btn-dark btn-sm" onclick="cycleVR(1)">▶</button>
+    </div>
+  `;
+}
+function cycleVR(dir){
+  if(!currentCity||!currentCity.vrTours)return;
+  vrImageIndex=(vrImageIndex+dir+currentCity.vrTours.length)%currentCity.vrTours.length;
+  loadVRScene(currentCity);
+}
+
+/* Hotel 360° VR */
+function openHotelVR(name, tourUrl, price, rating){
+  const overlay = document.getElementById('hotelVrOverlay');
+  const inner = document.getElementById('hotelVrInner');
+
+  overlay.classList.add('open');
+
+  document.getElementById('hotelVrName').textContent = name;
+
+  document.getElementById('hotelVrDesc').textContent =
+    `⭐ ${rating} · 💰 ${price} · Interactive 360° Tour`;
+
+  inner.innerHTML = `
+    <button class="hotel-vr-close" onclick="closeHotelVR()">✕</button>
+
+    <iframe
+      src="${tourUrl.includes('?')
+        ? tourUrl + '&autoplay=1&mute=1&rel=0'
+        : tourUrl + '?autoplay=1&mute=1&rel=0'}"
+      width="100%"
+      height="500"
+      style="
+        border:none;
+        border-radius:16px;
+        background:#000;
+        overflow:hidden;
+        box-shadow:0 8px 24px rgba(0,0,0,0.25);
+      "
+      allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allowfullscreen
+      loading="lazy">
+    </iframe>
+  `;
+}
+function closeHotelVR(){
+  document.getElementById('hotelVrOverlay').classList.remove('open');
+  const inner=document.getElementById('hotelVrInner');
+  const s=inner.querySelector('a-scene');
+  if(s)s.remove();
+}
+
+/* ══════════════════════════════════
+   OVERPASS – HOTELS
+══════════════════════════════════ */
+
+function loadNearbyHotels() {
+  if (!currentCity) {
+    alert('Please select a city first');
+    return;
+  }
+
+  fetchOverpass(currentCity.lat, currentCity.lng, 'hotel');
+}
+
+function triggerHotelSearch() {
+  const input = document.getElementById('hotelSearchInput');
+
+  if (!input) {
+    console.error('hotelSearchInput not found');
+    return;
+  }
+
+  const q = input.value.trim();
+
+  // If empty → load hotels near current city
+  if (!q) {
+    loadNearbyHotels();
+    return;
+  }
+
+  // Show loading
+  const hotelList = document.getElementById('hotelList');
+  if (hotelList) {
+    hotelList.innerHTML = `
+      <div class="loading">
+        Searching hotels...
+      </div>
+    `;
+  }
+
+  // Search location using Nominatim
+  fetch(
+    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q + ' hotel')}`
+  )
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Geocoding failed');
+      }
+      return response.json();
+    })
+    .then(data => {
+
+      // No results
+      if (!data || data.length === 0) {
+        alert('Location not found');
+        return;
+      }
+
+      // Correct coordinates
+      const lat = parseFloat(data[0].lat);
+      const lon = parseFloat(data[0].lon);
+
+      // Fetch nearby hotels
+      fetchOverpass(lat, lon, 'hotel');
+    })
+    .catch(err => {
+      console.error('Hotel search error:', err);
+
+      if (hotelList) {
+        hotelList.innerHTML = `
+          <div class="error">
+            Failed to load hotels
+          </div>
+        `;
+      }
+
+      alert('Could not fetch hotels');
+    });
+}
+function loadNearbyAttractions(){
+  if(!currentCity)return;
+  fetchOverpass(currentCity.lat,currentCity.lng,'attraction');
+}
+
+function fetchOverpass(lat,lon,type){
+  const gridId=type==='hotel'?'hotelCardsGrid':'attractionCardsGrid';
+  document.getElementById(gridId).innerHTML='<p style="color:var(--muted);font-size:.85rem;grid-column:1/-1">⏳ Loading from OpenStreetMap…</p>';
+  let query='';
+  if(type==='hotel'){
+    query=`[out:json];(node["tourism"="hotel"](around:20000,${lat},${lon});node["tourism"="guest_house"](around:20000,${lat},${lon});node["tourism"="hostel"](around:20000,${lat},${lon}););out;`;
+  } else {
+    query=`[out:json];(node["tourism"="attraction"](around:20000,${lat},${lon});node["tourism"="museum"](around:20000,${lat},${lon});node["tourism"="viewpoint"](around:20000,${lat},${lon});node["natural"="waterfall"](around:20000,${lat},${lon});node["leisure"="park"](around:20000,${lat},${lon}););out;`;
+  }
+  fetch('https://overpass-api.de/api/interpreter',{method:'POST',body:query})
+    .then(r=>r.json())
+    .then(data=>renderPlaceCards(data.elements,type,gridId))
+    .catch(()=>{document.getElementById(gridId).innerHTML='<p style="color:#f87171;grid-column:1/-1">Failed to load data. Please try again.</p>';});
+}
+
+function renderPlaceCards(elements,type,gridId){
+  const grid=document.getElementById(gridId);
+  const items=elements.filter(e=>e.tags&&e.tags.name).slice(0,12);
+  if(!items.length){grid.innerHTML='<p style="color:var(--muted);font-size:.85rem;grid-column:1/-1">No results found nearby.</p>';return;}
+
+  const isHotel=type==='hotel';
+  grid.innerHTML=items.map((place,i)=>{
+    const name=place.tags.name;
+    const stars=3+Math.floor(Math.random()*3); // 3-5 stars
+    const rating=(3.5+Math.random()*1.4).toFixed(1);
+    const price=isHotel?`₹${(800+Math.floor(Math.random()*4200)).toLocaleString()}/night`:'Free';
+    const ratingColor=parseFloat(rating)>=4?'green':'yellow';
+    const hotelVR = [
+      'https://www.360cities.net/image/hotel-room',
+      'https://www.airpano.com/360photo/india-goa-beach/',
+      'https://www.360cities.net/image/luxury-hotel-room',
+      'https://www.airpano.com/360photo/india-kerala-backwaters/'
+    ];
+    const vrTour = hotelVR[i % hotelVR.length];
+    const amenities=isHotel?['WiFi','AC','Parking','Restaurant'].slice(0,2+Math.floor(Math.random()*3)):['Guided Tour','Entry Ticket'];
+    const lat=place.lat?place.lat.toFixed(4):'—';
+    const lon=place.lon?place.lon.toFixed(4):'—';
+    const safeName=name.replace(/'/g,"\\'");
+    const safeVrTour=vrTour.replace(/'/g,"\\'");
+    return `
+      <div class="hotel-card">
+        <div class="hotel-card-img">
+          <img src="https://picsum.photos/seed/${encodeURIComponent(name)}/400/200" alt="${name}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=200&fit=crop'">
+        </div>
+        <div class="hotel-card-body">
+          <div class="hotel-card-name">${name}</div>
+          <div class="hotel-card-meta">
+            <span class="hotel-chip ${ratingColor}">⭐ ${rating}</span>
+            <span class="hotel-chip">${isHotel?'★'.repeat(stars):capFirst(type)}</span>
+            <span class="hotel-chip">${price}</span>
+          </div>
+          <div class="hotel-card-meta" style="margin-bottom:8px">
+            ${amenities.map(a=>`<span class="hotel-chip">✓ ${a}</span>`).join('')}
+          </div>
+          <p style="color:var(--muted);font-size:.75rem;margin-bottom:10px">📍 ${lat}, ${lon}</p>
+          <button class="btn btn-sm" onclick="openHotelVR('${safeName}','${vrTour}','${price}','${rating}')">🥽 View 360°</button>
+          ${isHotel?`<button class="btn btn-ghost btn-sm" style="margin-left:6px" onclick="addHotelToItinerary('${safeName}')">➕ Add</button>`:''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function addHotelToItinerary(name){
+  const title=`Hotel: ${name}`;
+  itinerary.push({title,details:''});
+  localStorage.setItem('itinerary',JSON.stringify(itinerary));
+  renderItinerary();
+  alert(`"${name}" added to your itinerary!`);
+}
+
+/* ══════════════════════════════════
+   LEAFLET MAP
+══════════════════════════════════ */
+function initMap(lat,lng,name){
+  document.getElementById('map').innerHTML='';
+  setTimeout(()=>{
+    if(leafletMap){leafletMap.remove();leafletMap=null;}
+    leafletMap=L.map('map',{zoomControl:true}).setView([lat,lng],13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors'}).addTo(leafletMap);
+    L.marker([lat,lng]).addTo(leafletMap).bindPopup(`<b>${name}</b>`).openPopup();
+  },350);
+}
+
+/* ══════════════════════════════════
+   WEATHER (Open-Meteo, free)
+══════════════════════════════════ */
+async function fetchWeather(lat,lng){
+  const el=document.getElementById('weatherContent');
+  el.innerHTML='<p style="color:var(--muted);font-size:.85rem">Loading…</p>';
+  try{
+    const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true&timezone=auto`);
+    const d=await r.json();const w=d.current_weather;
+    const icon=wIcon(w.weathercode);const desc=wDesc(w.weathercode);
+    el.innerHTML=`<div class="weather-row"><span class="weather-icon">${icon}</span><span class="weather-temp">${w.temperature}°C</span></div><p style="color:var(--muted);font-size:.82rem">${desc} · Wind ${w.windspeed} km/h</p><p style="color:var(--muted);font-size:.72rem;margin-top:4px;opacity:.6">via Open-Meteo (live)</p>`;
+  }catch{el.innerHTML='<p style="color:var(--muted);font-size:.85rem">Could not load weather.</p>';}
+}
+function wIcon(c){if(c===0)return'☀️';if(c<=3)return'⛅';if(c<=49)return'🌫️';if(c<=67)return'🌧️';if(c<=77)return'❄️';if(c<=82)return'🌦️';return'⛈️';}
+function wDesc(c){if(c===0)return'Clear sky';if(c<=3)return'Partly cloudy';if(c<=49)return'Foggy / Hazy';if(c<=67)return'Rainy';if(c<=77)return'Snow';if(c<=82)return'Showers';return'Thunderstorm';}
+
+/* ══════════════════════════════════
+   WISHLIST
+══════════════════════════════════ */
+function renderWishlistCard(name){
+  document.getElementById('wishlistList').innerHTML=wishlist.length
+    ?wishlist.map(w=>`<li>❤️ ${w}</li>`).join('')
+    :'<li style="border:none;background:none;color:var(--muted);font-style:italic">No wishlist items yet.</li>';
+}
+function toggleWishlist(){
+  if(!currentCity)return;
+  const n=currentCity.name,idx=wishlist.indexOf(n);
+  if(idx===-1)wishlist.push(n);else wishlist.splice(idx,1);
+  localStorage.setItem('wishlist',JSON.stringify(wishlist));
+  renderWishlistCard(n);
+}
+
+/* ══════════════════════════════════
+   ITINERARY
+══════════════════════════════════ */
+function addDay(){
+  const t=document.getElementById('dayTitle').value.trim();
+  const d=document.getElementById('dayDetails').value.trim();
+  if(!t){alert('Please enter a day title.');return;}
+  itinerary.push({title:t,details:d});
+  localStorage.setItem('itinerary',JSON.stringify(itinerary));
+  renderItinerary();
+  document.getElementById('dayTitle').value='';
+  document.getElementById('dayDetails').value='';
+}
+function renderItinerary(){
+  const el=document.getElementById('itineraryDays');
+  el.innerHTML=itinerary.length
+    ?itinerary.map((d,i)=>`<div class="itin-day"><h4>${d.title}<button onclick="removeDay(${i})" style="float:right;background:none;border:none;color:var(--orange);cursor:pointer;font-size:.8rem">✕</button></h4>${d.details?`<p>${d.details}</p>`:''}</div>`).join('')
+    :'<p style="color:var(--muted);font-size:.85rem">No itinerary days added yet.</p>';
+}
+function removeDay(i){itinerary.splice(i,1);localStorage.setItem('itinerary',JSON.stringify(itinerary));renderItinerary();}
+function clearItinerary(){if(!confirm('Clear entire itinerary?'))return;itinerary=[];localStorage.removeItem('itinerary');renderItinerary();}
+function addCurrentToItinerary(){
+  if(!currentCity)return;
+  document.getElementById('dayTitle').value=`Day ${itinerary.length+1}: Visit ${currentCity.name}`;
+  closeModal();
+  setTimeout(()=>document.getElementById('dayTitle').scrollIntoView({behavior:'smooth'}),300);
+}
+
+/* ══════════════════════════════════
+   BUDGET
+══════════════════════════════════ */
+function populateBudgetDropdown(){
+  const s=document.getElementById('budgetPlace');
+  CITIES.forEach(c=>{const o=document.createElement('option');o.value=c.name;o.textContent=`${c.name} (₹${c.costPerDay}/day)`;s.appendChild(o);});
+}
+function calculateBudget(){
+  const name=document.getElementById('budgetPlace').value;
+  const ppl=parseInt(document.getElementById('people').value);
+  const days=parseInt(document.getElementById('days2').value);
+  const el=document.getElementById('budgetResult');
+  if(!name||!ppl||!days){el.innerHTML='<span style="color:#f87171">Please fill all fields.</span>';return;}
+  const city=CITIES.find(c=>c.name===name);
+  const hotel=Math.round(city.costPerDay*ppl*days*0.4);
+  const travel=Math.round(city.costPerDay*ppl*days*0.3);
+  const food=Math.round(city.costPerDay*ppl*days*0.2);
+  const misc=Math.round(city.costPerDay*ppl*days*0.1);
+  const total=hotel+travel+food+misc;
+  el.innerHTML=`<div style="margin-top:12px;border-top:1px solid rgba(255,255,255,.1);padding-top:12px"><p>🏨 Accommodation &nbsp;<b>₹${hotel.toLocaleString()}</b></p><p>✈️ Travel &nbsp;<b>₹${travel.toLocaleString()}</b></p><p>🍽 Food &nbsp;<b>₹${food.toLocaleString()}</b></p><p>🎒 Misc &nbsp;<b>₹${misc.toLocaleString()}</b></p><hr style="border-color:rgba(255,255,255,.1);margin:10px 0"><p style="font-size:1.1rem;color:var(--orange);font-weight:600">💰 Estimated Total: ₹${total.toLocaleString()}</p><p style="font-size:.75rem;color:var(--muted);margin-top:6px">₹${city.costPerDay}/day · ${ppl} people · ${days} days</p></div>`;
+}
+
+/* ══════════════════════════════════
+   AI CHATBOT  (Anthropic API)
+══════════════════════════════════ */
+function toggleChat(){
+  const w=document.getElementById('chatWindow');
+  w.classList.toggle('open');
+  if(w.classList.contains('open'))document.getElementById('chatInput').focus();
+}
+
+function addBotMessage(text){
+  const msgs=document.getElementById('chatMessages');
+  msgs.innerHTML+=`<div class="chat-bubble bot">${text}</div>`;
+  msgs.scrollTop=msgs.scrollHeight;
+}
+function addUserMessage(text){
+  const msgs=document.getElementById('chatMessages');
+  msgs.innerHTML+=`<div class="chat-bubble user">${text}</div>`;
+  msgs.scrollTop=msgs.scrollHeight;
+}
+function addTyping(){
+  const msgs=document.getElementById('chatMessages');
+  msgs.innerHTML+=`<div class="chat-bubble typing" id="typingBubble">✦ Thinking…</div>`;
+  msgs.scrollTop=msgs.scrollHeight;
+}
+function removeTyping(){
+  const t=document.getElementById('typingBubble');
+  if(t)t.remove();
+}
+
+async function sendChat(){
+  const input=document.getElementById('chatInput');
+  const text=input.value.trim();
+  if(!text)return;
+  input.value='';
+  addUserMessage(text);
+  chatHistory.push({role:'user',content:text});
+  addTyping();
+
+  // Build context about current destination
+  const ctx=currentCity
+    ?`The user is currently viewing the "${currentCity.name}" destination page on the Discover India travel website. Known info: ${currentCity.sub}. Food: ${currentCity.food}. Best time: ${currentCity.best}. Tips: ${currentCity.tips.join('. ')}.`
+    :'The user is on the Discover India travel website which covers popular Indian destinations like Agra, Jaipur, Goa, Manali, Varanasi, Delhi, Kerala, Darjeeling, Hampi, and Udaipur.';
+
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:`You are a knowledgeable and friendly India travel assistant embedded in a travel website called "Discover India". ${ctx}
+Help travellers with questions about destinations, hotels, food, weather, budgets, transportation, visa, culture, and safety in India. Be concise (2-4 sentences usually), warm, and practical. Use occasional emojis. Never make up hotel names or prices — if asked for specific current prices, say prices vary and suggest booking platforms like MakeMyTrip or Booking.com.`,
+        messages:chatHistory
+      })
+    });
+    const data=await resp.json();
+    removeTyping();
+    const reply=data.content?.[0]?.text||'Sorry, I could not get a response. Please try again.';
+    chatHistory.push({role:'assistant',content:reply});
+    addBotMessage(reply);
+  }catch(err){
+    removeTyping();
+    addBotMessage('⚠️ Could not connect to the assistant right now. Please try again in a moment.');
+    chatHistory.pop();
+  }
+}
+</script>
+</body>
+</html>
+HTMLEOF
+echo "Done"
+Done
+

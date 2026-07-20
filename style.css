@@ -1,0 +1,166 @@
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:'Poppins',sans-serif;
+  background:linear-gradient(135deg,#0f172a,#1e293b);
+  padding:24px;
+}
+
+.page{
+  max-width:1500px;
+  margin:auto;
+  background:#020617;
+  border-radius:22px;
+  overflow:hidden;
+}
+
+.top-hero{
+  padding:70px;
+  color:white;
+  background:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1600') center/cover;
+}
+
+.hero-title{
+  font-family:'Playfair Display',serif;
+  font-size:3rem;
+}
+
+.section{
+  padding:40px;
+}
+
+.controls{
+  margin-bottom:20px;
+}
+
+.controls input{
+  padding:12px 16px;
+  width:100%;
+  border:none;
+  border-radius:12px;
+}
+
+.dest-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:22px;
+}
+
+.dest-card{
+  background:white;
+  border-radius:18px;
+  overflow:hidden;
+  transition:.3s;
+}
+
+.dest-card:hover{
+  transform:translateY(-6px);
+}
+
+.dest-image{
+  height:200px;
+  background-size:cover;
+  background-position:center;
+}
+
+.dest-content{
+  padding:18px;
+}
+
+.dest-title{
+  font-family:'Playfair Display',serif;
+  font-size:1.4rem;
+}
+
+.dest-sub{
+  color:#666;
+  margin:10px 0;
+}
+
+.btn{
+  padding:10px 14px;
+  border:none;
+  border-radius:12px;
+  background:#f97316;
+  color:white;
+  cursor:pointer;
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  justify-content:center;
+  align-items:flex-start;
+  padding:40px 20px;
+  background:rgba(0,0,0,.85);
+  overflow-y:auto;
+  z-index:999;
+}
+
+.modal.open{
+  display:flex;
+}
+
+.modal-card{
+  width:100%;
+  max-width:1200px;
+  background:white;
+  border-radius:20px;
+  overflow:hidden;
+}
+
+.modal-head{
+  padding:20px;
+  background:#f97316;
+  color:white;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.modal-body{
+  padding:24px;
+  display:grid;
+  grid-template-columns:1fr 350px;
+  gap:20px;
+}
+
+.card{
+  background:#fff;
+  padding:18px;
+  border-radius:14px;
+  box-shadow:0 10px 20px rgba(0,0,0,.08);
+  margin-bottom:20px;
+}
+
+ul{
+  list-style:none;
+}
+
+li{
+  background:#fff7ed;
+  margin-bottom:8px;
+  padding:8px;
+  border-left:4px solid #f97316;
+  border-radius:8px;
+}
+
+#vrContainer{
+  height:400px;
+  border-radius:16px;
+  overflow:hidden;
+  margin-bottom:20px;
+}
+
+@media(max-width:900px){
+
+  .modal-body{
+    grid-template-columns:1fr;
+  }
+
+}

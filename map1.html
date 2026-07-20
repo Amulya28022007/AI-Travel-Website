@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TERRA — Journey Beyond</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Epilogue:wght@200;300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
+
+<script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+<style>
+  :root {
+    --sand: #E8DCC8;
+    --clay: #C4A882;
+    --terracotta: #C4704A;
+    --dusk: #2C3E50;
+    --midnight: #0F1923;
+    --mist: #F5F0E8;
+    --gold: #D4A853;
+    --sage: #7A8C6E;
+    --cream: #FAF6EE;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Epilogue', sans-serif;
+    background: var(--midnight);
+    color: var(--sand);
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.4rem 3rem;
+    background: rgba(15,25,35,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(232,220,200,0.08);
+    transition: all 0.3s;
+  }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem; font-weight: 300; letter-spacing: 0.2em;
+    color: var(--sand); text-decoration: none;
+  }
+  .nav-logo span { color: var(--terracotta); }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: rgba(232,220,200,0.65); text-decoration: none;
+    transition: color 0.3s; font-weight: 300;
+  }
+  .nav-links a:hover { color: var(--sand); }
+  .nav-cta {
+    font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 0.65rem 1.6rem; border: 1px solid var(--terracotta);
+    color: var(--terracotta); background: transparent; cursor: pointer;
+    transition: all 0.3s; font-family: 'Epilogue', sans-serif;
+  }
+  .nav-cta:hover { background: var(--terracotta); color: #fff; }
+
+  /* ── HERO ── */
+  .hero {
+    height: 100vh; position: relative;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #0F1923 0%, #1a2a3a 40%, #2C3E50 100%);
+  }
+  .hero-bg::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 30 Q30 0 60 30 Q30 60 0 30Z' fill='none' stroke='rgba(196,168,130,0.04)' stroke-width='1'/%3E%3C/svg%3E") repeat;
+  }
+  .floating-orb {
+    position: absolute; border-radius: 50%;
+    filter: blur(80px); pointer-events: none; animation: drift 12s ease-in-out infinite;
+  }
+  .orb1 { width: 500px; height: 500px; background: rgba(196,112,74,0.12); top:-100px; right:-100px; animation-delay:0s; }
+  .orb2 { width: 350px; height: 350px; background: rgba(122,140,110,0.1); bottom:-80px; left:-80px; animation-delay:-6s; }
+  @keyframes drift {
+    0%,100% { transform: translate(0,0) scale(1); }
+    50% { transform: translate(30px,-30px) scale(1.05); }
+  }
+  .hero-content {
+    position: relative; text-align: center; z-index: 2; padding: 0 2rem;
+  }
+  .hero-eyebrow {
+    font-size: 0.68rem; letter-spacing: 0.35em; text-transform: uppercase;
+    color: var(--terracotta); margin-bottom: 1.5rem;
+    animation: fadeUp 1s ease both;
+  }
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(4rem, 10vw, 9rem); font-weight: 300; line-height: 0.9;
+    color: var(--sand); margin-bottom: 1rem;
+    animation: fadeUp 1s ease 0.15s both;
+  }
+  .hero-title em { font-style: italic; color: var(--clay); }
+  .hero-sub {
+    font-size: 0.9rem; font-weight: 200; color: rgba(232,220,200,0.6);
+    letter-spacing: 0.04em; max-width: 480px; margin: 0 auto 3rem;
+    animation: fadeUp 1s ease 0.3s both; line-height: 1.8;
+  }
+  .hero-btns {
+    display: flex; gap: 1.2rem; justify-content: center; flex-wrap: wrap;
+    animation: fadeUp 1s ease 0.45s both;
+  }
+  .btn-primary {
+    padding: 1rem 2.5rem; background: var(--terracotta); color: #fff;
+    font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase;
+    border: none; cursor: pointer; transition: all 0.3s;
+    font-family: 'Epilogue', sans-serif;
+  }
+  .btn-primary:hover { background: #b5603c; transform: translateY(-2px); }
+  .btn-outline {
+    padding: 1rem 2.5rem; background: transparent;
+    border: 1px solid rgba(232,220,200,0.3); color: var(--sand);
+    font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.3s; font-family: 'Epilogue', sans-serif;
+  }
+  .btn-outline:hover { border-color: var(--sand); background: rgba(232,220,200,0.05); }
+  .scroll-indicator {
+    position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    animation: fadeUp 1s ease 0.8s both;
+  }
+  .scroll-indicator span { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(232,220,200,0.4); }
+  .scroll-line { width: 1px; height: 50px; background: linear-gradient(to bottom, var(--clay), transparent); animation: scrollPulse 2s ease-in-out infinite; }
+  @keyframes scrollPulse { 0%,100%{transform:scaleY(1)} 50%{transform:scaleY(0.5)} }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ── SEARCH BAR ── */
+  .search-section {
+    background: var(--cream); padding: 3.5rem 3rem;
+    display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
+  }
+  .search-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem; font-weight: 300; color: var(--midnight);
+    letter-spacing: 0.05em;
+  }
+  .search-bar {
+    display: flex; gap: 0; background: #fff; border: 1px solid rgba(44,62,80,0.12);
+    overflow: hidden; width: 100%; max-width: 900px;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.06);
+  }
+  .search-field {
+    flex: 1; display: flex; flex-direction: column;
+    padding: 1rem 1.5rem; border-right: 1px solid rgba(44,62,80,0.1);
+    cursor: pointer; transition: background 0.2s;
+  }
+  .search-field:hover { background: rgba(232,220,200,0.2); }
+  .search-field label {
+    font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--terracotta); font-weight: 500; margin-bottom: 0.2rem;
+  }
+  .search-field input, .search-field select {
+    border: none; outline: none; background: transparent;
+    font-family: 'Epilogue', sans-serif; font-size: 0.88rem;
+    color: var(--midnight); font-weight: 300; width: 100%;
+  }
+  .search-btn {
+    padding: 0 2rem; background: var(--terracotta); color: #fff;
+    border: none; cursor: pointer; font-size: 0.75rem; letter-spacing: 0.14em;
+    text-transform: uppercase; font-family: 'Epilogue', sans-serif;
+    transition: background 0.3s; white-space: nowrap;
+  }
+  .search-btn:hover { background: #b5603c; }
+
+  /* ── SECTION COMMON ── */
+  section { padding: 6rem 3rem; }
+  .section-eyebrow {
+    font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--terracotta); margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.2rem, 4vw, 3.5rem); font-weight: 300; line-height: 1.1;
+    margin-bottom: 3rem;
+  }
+
+  /* ── DESTINATIONS ── */
+  .destinations { background: var(--midnight); }
+  .destinations .section-title { color: var(--sand); }
+  .dest-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: 280px 280px;
+    gap: 1rem; max-width: 1200px; margin: 0 auto;
+  }
+  .dest-card {
+    position: relative; overflow: hidden; cursor: pointer;
+    border-radius: 2px;
+  }
+  .dest-card:first-child { grid-row: 1 / 3; }
+  .dest-card .card-bg {
+    width: 100%; height: 100%;
+    background-size: cover; background-position: center;
+    transition: transform 0.6s ease;
+  }
+  .dest-card:hover .card-bg { transform: scale(1.08); }
+  .dest-card .card-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(15,25,35,0.85) 0%, rgba(15,25,35,0.1) 60%);
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 1.8rem;
+  }
+  .card-label {
+    font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--clay); margin-bottom: 0.4rem;
+  }
+  .card-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem; font-weight: 300; color: var(--sand); line-height: 1.1;
+  }
+  .dest-card:first-child .card-name { font-size: 2.2rem; }
+  .card-vr-badge {
+    position: absolute; top: 1rem; right: 1rem;
+    background: rgba(196,112,74,0.9); color: #fff;
+    font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 0.3rem 0.7rem; border-radius: 2px;
+  }
+
+  /* destination gradient backgrounds */
+  .bg-santorini { background: linear-gradient(135deg, #1a6b9a 0%, #2c8fbf 40%, #4eb8e0 70%, #8ed4f0 100%); }
+  .bg-bali { background: linear-gradient(135deg, #2d5016 0%, #4a7c2a 40%, #6da542 70%, #8fc05a 100%); }
+  .bg-kyoto { background: linear-gradient(135deg, #8b0000 0%, #c0392b 40%, #e74c3c 60%, #f89b9b 100%); }
+  .bg-morocco { background: linear-gradient(135deg, #8B4513 0%, #cd853f 40%, #daa520 70%, #f0c050 100%); }
+  .bg-maldives { background: linear-gradient(135deg, #006994 0%, #00bcd4 40%, #4dd0e1 70%, #b2ebf2 100%); }
+
+  /* ── VR PANORAMIC SECTION ── */
+  .vr-section { background: var(--mist); }
+  .vr-section .section-title { color: var(--midnight); }
+  .vr-intro { font-size: 0.88rem; color: rgba(44,62,80,0.65); max-width: 580px; margin-bottom: 3rem; line-height: 1.9; font-weight: 300; }
+  .vr-tabs {
+    display: flex; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap;
+  }
+  .vr-tab {
+    padding: 0.6rem 1.4rem; border: 1px solid rgba(44,62,80,0.2);
+    background: transparent; cursor: pointer; font-size: 0.72rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--dusk);
+    font-family: 'Epilogue', sans-serif; transition: all 0.25s; border-radius: 2px;
+  }
+  .vr-tab.active { background: var(--dusk); color: var(--sand); border-color: var(--dusk); }
+  .vr-viewer-wrap { position: relative; max-width: 1100px; }
+  .vr-viewer {
+    width: 100%; height: 500px; background: var(--midnight);
+    border-radius: 4px; overflow: hidden; position: relative;
+  }
+  /* Simulated 360° panorama using CSS 3D */
+  .pano-scene {
+    width: 100%; height: 100%; position: relative;
+    perspective: 800px; cursor: grab;
+    user-select: none;
+  }
+  .pano-scene:active { cursor: grabbing; }
+  .pano-ring {
+    width: 100%; height: 100%;
+    position: absolute; top: 0; left: 0;
+    transform-style: preserve-3d;
+    transition: transform 0.05s linear;
+  }
+  .pano-panel {
+    position: absolute; width: 200px; height: 100%;
+    opacity: 0.9;
+    background-size: cover; background-position: center;
+    backface-visibility: visible;
+  }
+
+  /* Canvas-based panorama */
+  #panoCanvas {
+    width: 100%; height: 100%; display: block;
+    cursor: grab;
+  }
+  #panoCanvas:active { cursor: grabbing; }
+
+  .vr-overlay {
+    position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(to right, rgba(15,25,35,0.5) 0%, transparent 20%, transparent 80%, rgba(15,25,35,0.5) 100%);
+  }
+  .vr-hud {
+    position: absolute; top: 1.5rem; left: 1.5rem;
+    display: flex; flex-direction: column; gap: 0.5rem;
+  }
+  .vr-location-badge {
+    background: rgba(15,25,35,0.75); backdrop-filter: blur(8px);
+    padding: 0.5rem 1rem; color: var(--sand);
+    font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+    border-left: 2px solid var(--terracotta);
+  }
+  .vr-coords {
+    font-size: 0.6rem; color: rgba(232,220,200,0.5); letter-spacing: 0.08em;
+    font-family: monospace; background: rgba(15,25,35,0.6); padding: 0.3rem 0.8rem;
+    display: inline-block;
+  }
+  .vr-controls {
+    position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 0.8rem; align-items: center;
+    pointer-events: all;
+  }
+  .vr-btn {
+    width: 2.8rem; height: 2.8rem; border-radius: 50%;
+    background: rgba(15,25,35,0.75); backdrop-filter: blur(8px);
+    border: 1px solid rgba(232,220,200,0.2); color: var(--sand);
+    font-size: 1rem; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .vr-btn:hover { background: var(--terracotta); border-color: var(--terracotta); }
+  .vr-enter-btn {
+    padding: 0.7rem 1.8rem; background: var(--terracotta); color: #fff;
+    border: none; cursor: pointer; font-size: 0.72rem; letter-spacing: 0.14em;
+    text-transform: uppercase; font-family: 'Epilogue', sans-serif;
+    transition: all 0.3s; border-radius: 2px;
+  }
+  .vr-enter-btn:hover { background: #b5603c; }
+  .vr-info-panel {
+    margin-top: 1rem; display: flex; gap: 1rem; flex-wrap: wrap;
+  }
+  .vr-info-card {
+    flex: 1; min-width: 180px; padding: 1.2rem 1.5rem;
+    background: rgba(44,62,80,0.06); border: 1px solid rgba(44,62,80,0.1);
+    border-radius: 2px;
+  }
+  .vr-info-card h4 { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 0.4rem; }
+  .vr-info-card p { font-size: 0.85rem; color: var(--dusk); font-weight: 300; }
+
+  /* ── GOOGLE MAPS ── */
+  .map-section { background: var(--midnight); padding: 6rem 3rem; }
+  .map-section .section-title { color: var(--sand); }
+  .map-container {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem;
+  }
+  #googleMap {
+    height: 480px; border-radius: 4px; overflow: hidden;
+    background: #1a2a3a; position: relative;
+  }
+  .map-fallback {
+    width: 100%; height: 100%; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 1rem;
+    color: rgba(232,220,200,0.5);
+  }
+  .map-fallback .map-icon { font-size: 3rem; }
+  .map-fallback p { font-size: 0.8rem; letter-spacing: 0.06em; text-align: center; max-width: 280px; line-height: 1.7; }
+  .map-embed {
+    width: 100%; height: 100%; border: none; border-radius: 4px;
+  }
+  .map-sidebar { display: flex; flex-direction: column; gap: 1rem; }
+  .map-hotspot {
+    padding: 1.2rem 1.5rem; background: rgba(232,220,200,0.05);
+    border: 1px solid rgba(232,220,200,0.1); border-radius: 2px;
+    cursor: pointer; transition: all 0.25s;
+  }
+  .map-hotspot:hover, .map-hotspot.active {
+    background: rgba(196,112,74,0.12); border-color: var(--terracotta);
+  }
+  .hotspot-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem; }
+  .hotspot-name { font-size: 0.88rem; color: var(--sand); font-weight: 400; }
+  .hotspot-vr { font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--terracotta); }
+  .hotspot-desc { font-size: 0.75rem; color: rgba(232,220,200,0.5); line-height: 1.6; font-weight: 300; }
+  .hotspot-rating { display: flex; gap: 0.2rem; margin-top: 0.5rem; }
+  .star { color: var(--gold); font-size: 0.75rem; }
+
+  /* ── PACKAGES ── */
+  .packages { background: var(--cream); }
+  .packages .section-title { color: var(--midnight); }
+  .pkg-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem; max-width: 1100px; margin: 0 auto;
+  }
+  .pkg-card {
+    background: #fff; border: 1px solid rgba(44,62,80,0.08);
+    border-radius: 4px; overflow: hidden;
+    transition: all 0.3s; cursor: pointer;
+  }
+  .pkg-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
+  .pkg-img {
+    height: 200px; position: relative; overflow: hidden;
+  }
+  .pkg-img .pkg-bg { width: 100%; height: 100%; background-size: cover; background-position: center; transition: transform 0.5s; }
+  .pkg-card:hover .pkg-bg { transform: scale(1.05); }
+  .pkg-tag {
+    position: absolute; top: 1rem; left: 1rem;
+    background: var(--terracotta); color: #fff;
+    font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 0.3rem 0.7rem;
+  }
+  .pkg-body { padding: 1.5rem; }
+  .pkg-country { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--clay); margin-bottom: 0.4rem; }
+  .pkg-name { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 400; color: var(--midnight); margin-bottom: 0.8rem; }
+  .pkg-features { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+  .pkg-feat { font-size: 0.7rem; color: rgba(44,62,80,0.6); display: flex; align-items: center; gap: 0.3rem; }
+  .pkg-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 1rem; border-top: 1px solid rgba(44,62,80,0.08); }
+  .pkg-price sup { font-size: 0.75rem; vertical-align: super; color: var(--terracotta); }
+  .pkg-price strong { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; color: var(--midnight); font-weight: 300; }
+  .pkg-price span { font-size: 0.68rem; color: rgba(44,62,80,0.5); }
+  .pkg-book { padding: 0.55rem 1.3rem; background: var(--midnight); color: var(--sand); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; border: none; cursor: pointer; font-family: 'Epilogue', sans-serif; transition: all 0.25s; }
+  .pkg-book:hover { background: var(--terracotta); }
+
+  /* ── TESTIMONIALS ── */
+  .testimonials { background: var(--midnight); }
+  .testimonials .section-title { color: var(--sand); }
+  .testi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; max-width: 1100px; margin: 0 auto; }
+  .testi-card {
+    padding: 2rem; background: rgba(232,220,200,0.04); border: 1px solid rgba(232,220,200,0.08);
+    border-radius: 2px; position: relative;
+  }
+  .testi-quote { font-family: 'Cormorant Garamond', serif; font-size: 3rem; color: var(--terracotta); line-height: 1; margin-bottom: 1rem; }
+  .testi-text { font-size: 0.88rem; color: rgba(232,220,200,0.7); line-height: 1.85; font-weight: 300; font-style: italic; margin-bottom: 1.5rem; }
+  .testi-author { display: flex; align-items: center; gap: 0.8rem; }
+  .testi-avatar { width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--clay); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--midnight); }
+  .testi-name { font-size: 0.82rem; color: var(--sand); font-weight: 400; }
+  .testi-trip { font-size: 0.68rem; color: rgba(232,220,200,0.4); letter-spacing: 0.06em; }
+
+  /* ── NEWSLETTER ── */
+  .newsletter {
+    background: linear-gradient(135deg, var(--terracotta) 0%, #a85430 100%);
+    padding: 5rem 3rem; text-align: center;
+  }
+  .newsletter h2 {
+    font-family: 'Cormorant Garamond', serif; font-size: 2.8rem; font-weight: 300;
+    color: #fff; margin-bottom: 0.8rem;
+  }
+  .newsletter p { font-size: 0.88rem; color: rgba(255,255,255,0.75); margin-bottom: 2rem; font-weight: 300; }
+  .newsletter-form { display: flex; gap: 0; max-width: 480px; margin: 0 auto; }
+  .newsletter-input {
+    flex: 1; padding: 1rem 1.5rem; border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.1); color: #fff; outline: none;
+    font-family: 'Epilogue', sans-serif; font-size: 0.85rem;
+    backdrop-filter: blur(4px);
+  }
+  .newsletter-input::placeholder { color: rgba(255,255,255,0.5); }
+  .newsletter-submit {
+    padding: 1rem 1.8rem; background: var(--midnight); color: var(--sand);
+    border: none; cursor: pointer; font-size: 0.72rem; letter-spacing: 0.12em;
+    text-transform: uppercase; font-family: 'Epilogue', sans-serif; transition: background 0.3s;
+  }
+  .newsletter-submit:hover { background: #0a1218; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: #0a1218; padding: 4rem 3rem 2rem;
+    border-top: 1px solid rgba(232,220,200,0.06);
+  }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; max-width: 1200px; margin: 0 auto 3rem; }
+  .footer-brand .logo { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 300; color: var(--sand); letter-spacing: 0.2em; margin-bottom: 1rem; }
+  .footer-brand .logo span { color: var(--terracotta); }
+  .footer-brand p { font-size: 0.82rem; color: rgba(232,220,200,0.4); line-height: 1.8; font-weight: 300; max-width: 260px; }
+  .footer-col h4 { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--clay); margin-bottom: 1.2rem; }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; }
+  .footer-col ul a { font-size: 0.8rem; color: rgba(232,220,200,0.45); text-decoration: none; transition: color 0.25s; font-weight: 300; }
+  .footer-col ul a:hover { color: var(--sand); }
+  .footer-bottom { border-top: 1px solid rgba(232,220,200,0.06); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; flex-wrap: wrap; gap: 1rem; }
+  .footer-copy { font-size: 0.72rem; color: rgba(232,220,200,0.25); letter-spacing: 0.06em; }
+  .footer-social { display: flex; gap: 1rem; }
+  .social-link { width: 2rem; height: 2rem; border: 1px solid rgba(232,220,200,0.15); display: flex; align-items: center; justify-content: center; color: rgba(232,220,200,0.4); text-decoration: none; font-size: 0.75rem; transition: all 0.25s; }
+  .social-link:hover { border-color: var(--terracotta); color: var(--terracotta); }
+
+  /* ── VR MODAL ── */
+  .vr-modal {
+    display: none; position: fixed; inset: 0; z-index: 2000;
+    background: rgba(10,18,24,0.95); backdrop-filter: blur(12px);
+    align-items: center; justify-content: center;
+  }
+  .vr-modal.open { display: flex; }
+  .vr-modal-content {
+    width: 95vw; max-width: 1100px; background: var(--midnight);
+    border: 1px solid rgba(232,220,200,0.1); border-radius: 4px;
+    overflow: hidden; position: relative;
+  }
+  .vr-modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.2rem 1.8rem; border-bottom: 1px solid rgba(232,220,200,0.08);
+  }
+  .vr-modal-title { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 300; color: var(--sand); }
+  .vr-modal-close { background: none; border: none; color: var(--sand); font-size: 1.2rem; cursor: pointer; opacity: 0.6; transition: opacity 0.2s; }
+  .vr-modal-close:hover { opacity: 1; }
+  .vr-modal-body { padding: 0; position: relative; }
+  #modalPanoCanvas { width: 100%; height: 500px; display: block; cursor: grab; }
+  #modalPanoCanvas:active { cursor: grabbing; }
+  .vr-modal-footer {
+    padding: 1rem 1.8rem; border-top: 1px solid rgba(232,220,200,0.08);
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+  }
+  .vr-instructions { font-size: 0.72rem; color: rgba(232,220,200,0.45); letter-spacing: 0.06em; }
+  .vr-place-btns { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+  .vr-place-btn { padding: 0.45rem 1rem; background: rgba(232,220,200,0.08); border: 1px solid rgba(232,220,200,0.15); color: rgba(232,220,200,0.7); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; font-family: 'Epilogue', sans-serif; transition: all 0.2s; border-radius: 2px; }
+  .vr-place-btn:hover, .vr-place-btn.active { background: var(--terracotta); border-color: var(--terracotta); color: #fff; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    nav { padding: 1.2rem 1.5rem; }
+    .nav-links { display: none; }
+    section { padding: 4rem 1.5rem; }
+    .dest-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+    .dest-card:first-child { grid-column: 1 / 3; grid-row: 1; }
+    .map-container { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .search-bar { flex-direction: column; }
+    .search-field { border-right: none; border-bottom: 1px solid rgba(44,62,80,0.1); }
+    .search-btn { padding: 1rem; }
+    #googleMap { height: 320px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">T<span>E</span>RRA</a>
+  <ul class="nav-links">
+    <li><a href="#destinations">Destinations</a></li>
+    <li><a href="#vr">VR Explore</a></li>
+    <li><a href="#packages">Packages</a></li>
+    <li><a href="#map">Map</a></li>
+    <li><a href="#reviews">Reviews</a></li>
+  </ul>
+  <button class="nav-cta" onclick="openVrModal()">▶ VR Preview</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="floating-orb orb1"></div>
+    <div class="floating-orb orb2"></div>
+  </div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">◈ Crafting World-Class Journeys Since 2010</p>
+    <h1 class="hero-title">Discover<br><em>the world</em><br>in 360°</h1>
+    <p class="hero-sub">Immersive VR panoramas, curated itineraries, and seamless booking — all in one place.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="document.getElementById('destinations').scrollIntoView({behavior:'smooth'})">Explore Destinations</button>
+      <button class="btn-outline" onclick="openVrModal()">▶ Watch VR Tour</button>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- SEARCH -->
+<div class="search-section">
+  <p class="search-label">Find your perfect getaway</p>
+  <div class="search-bar">
+    <div class="search-field">
+      <label>Destination</label>
+      <input type="text" placeholder="Bali, Santorini, Kyoto…">
+    </div>
+    <div class="search-field">
+      <label>Check-in</label>
+      <input type="date">
+    </div>
+    <div class="search-field">
+      <label>Check-out</label>
+      <input type="date">
+    </div>
+    <div class="search-field">
+      <label>Guests</label>
+      <select>
+        <option>2 Adults</option>
+        <option>1 Adult</option>
+        <option>2 Adults + 1 Child</option>
+        <option>2 Adults + 2 Children</option>
+        <option>Group (6+)</option>
+      </select>
+    </div>
+    <button class="search-btn" onclick="handleSearch()">Search →</button>
+  </div>
+</div>
+
+<!-- DESTINATIONS -->
+<section class="destinations" id="destinations">
+  <div style="max-width:1200px;margin:0 auto;">
+    <p class="section-eyebrow">◈ Handpicked Escapes</p>
+    <h2 class="section-title" style="color:var(--sand)">Top<br><em style="font-style:italic;color:var(--clay)">Destinations</em></h2>
+    <div class="dest-grid">
+      <div class="dest-card" onclick="openVrModal('santorini')">
+        <div class="card-bg bg-santorini" style="background-image:linear-gradient(to bottom right,#0d47a1,#1565c0,#1e88e5,#42a5f5,#90caf9)"></div>
+        <div class="card-overlay">
+          <p class="card-label">Greece</p>
+          <h3 class="card-name">Santorini</h3>
+        </div>
+        <span class="card-vr-badge">360° VR</span>
+      </div>
+      <div class="dest-card" onclick="openVrModal('bali')">
+        <div class="card-bg" style="background-image:linear-gradient(135deg,#1b5e20,#388e3c,#66bb6a,#a5d6a7)"></div>
+        <div class="card-overlay">
+          <p class="card-label">Indonesia</p>
+          <h3 class="card-name">Bali</h3>
+        </div>
+        <span class="card-vr-badge">360° VR</span>
+      </div>
+      <div class="dest-card" onclick="openVrModal('kyoto')">
+        <div class="card-bg" style="background-image:linear-gradient(135deg,#b71c1c,#e53935,#ef9a9a,#c2185b)"></div>
+        <div class="card-overlay">
+          <p class="card-label">Japan</p>
+          <h3 class="card-name">Kyoto</h3>
+        </div>
+      </div>
+      <div class="dest-card" onclick="openVrModal('morocco')">
+        <div class="card-bg" style="background-image:linear-gradient(135deg,#bf360c,#e64a19,#ff7043,#ffa726)"></div>
+        <div class="card-overlay">
+          <p class="card-label">Morocco</p>
+          <h3 class="card-name">Marrakech</h3>
+        </div>
+        <span class="card-vr-badge">360° VR</span>
+      </div>
+      <div class="dest-card" onclick="openVrModal('maldives')">
+        <div class="card-bg" style="background-image:linear-gradient(135deg,#006064,#00838f,#26c6da,#b2ebf2)"></div>
+        <div class="card-overlay">
+          <p class="card-label">Maldives</p>
+          <h3 class="card-name">Malé Atoll</h3>
+        </div>
+        <span class="card-vr-badge">360° VR</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VR SECTION -->
+<section class="vr-section" id="vr">
+  <div style="max-width:1100px;margin:0 auto;">
+    <p class="section-eyebrow">◈ Immersive Technology</p>
+    <h2 class="section-title">Virtual Reality<br><em style="font-style:italic;color:var(--terracotta)">Panoramic Explorer</em></h2>
+    <p class="vr-intro">Experience destinations before you book. Drag to rotate in any direction across full 360° immersive scenes — powered by equirectangular projection rendering, just like Google Street View.</p>
+    <div class="vr-tabs">
+      <button class="vr-tab active" onclick="switchVrScene('beach')">🏖 Beach Resort</button>
+      <button class="vr-tab" onclick="switchVrScene('temple')">🏯 Temple</button>
+      <button class="vr-tab" onclick="switchVrScene('city')">🌆 City Skyline</button>
+      <button class="vr-tab" onclick="switchVrScene('forest')">🌿 Forest</button>
+    </div>
+    <div class="vr-viewer-wrap">
+      <div class="vr-viewer">
+        <div id="panoCanvas"></div>
+        <div class="vr-overlay"></div>
+        <div class="vr-hud">
+          <div class="vr-location-badge" id="vrLocationBadge">Maldives Beach Resort</div>
+          <div class="vr-coords" id="vrCoords">4.1755° N, 73.5093° E</div>
+        </div>
+        <div class="vr-controls">
+          <button class="vr-btn" onclick="rotatePano(-30)" title="Rotate Left">←</button>
+          <button class="vr-btn" onclick="rotatePano(0, -20)" title="Look Up">↑</button>
+          <button class="vr-enter-btn" onclick="openVrModal()">Enter Full VR</button>
+          <button class="vr-btn" onclick="rotatePano(0, 20)" title="Look Down">↓</button>
+          <button class="vr-btn" onclick="rotatePano(30)" title="Rotate Right">→</button>
+        </div>
+      </div>
+      <div class="vr-info-panel">
+        <div class="vr-info-card"><h4>Render Engine</h4><p>Equirectangular 360° Projection</p></div>
+        <div class="vr-info-card"><h4>Coverage</h4><p>360° horizontal · 180° vertical</p></div>
+        <div class="vr-info-card"><h4>Interaction</h4><p>Drag, scroll to zoom, keyboard WASD</p></div>
+        <div class="vr-info-card"><h4>VR Ready</h4><p>Google Cardboard compatible</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAP SECTION -->
+<section class="map-section" id="map">
+  <div style="max-width:1100px;margin:0 auto;">
+    <p class="section-eyebrow">◈ Interactive Map</p>
+    <h2 class="section-title">Explore on the<br><em style="font-style:italic;color:var(--clay)">World Map</em></h2>
+    <div class="map-container">
+      <div id="googleMap">
+        <!-- Google Maps Embed (replace YOUR_API_KEY with a real key) -->
+        <iframe
+          class="map-embed"
+          src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d30000000!2d20!3d20!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus"
+          allowfullscreen
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+      <div class="map-sidebar">
+        <div class="map-hotspot active" onclick="focusMap(36.3932, 25.4615, 'Santorini, Greece')">
+          <div class="hotspot-header">
+            <span class="hotspot-name">Santorini, Greece</span>
+            <span class="hotspot-vr">360°</span>
+          </div>
+          <p class="hotspot-desc">Iconic whitewashed cliffs, volcanic beaches & sunset views.</p>
+          <div class="hotspot-rating">
+            <span class="star">★★★★★</span><span style="font-size:0.7rem;color:rgba(232,220,200,0.4);margin-left:0.4rem">4.9</span>
+          </div>
+        </div>
+        <div class="map-hotspot" onclick="focusMap(-8.3405, 115.0920, 'Bali, Indonesia')">
+          <div class="hotspot-header">
+            <span class="hotspot-name">Bali, Indonesia</span>
+            <span class="hotspot-vr">360°</span>
+          </div>
+          <p class="hotspot-desc">Temples, rice terraces & world-class surf breaks.</p>
+          <div class="hotspot-rating">
+            <span class="star">★★★★★</span><span style="font-size:0.7rem;color:rgba(232,220,200,0.4);margin-left:0.4rem">4.8</span>
+          </div>
+        </div>
+        <div class="map-hotspot" onclick="focusMap(35.0116, 135.7681, 'Kyoto, Japan')">
+          <div class="hotspot-header">
+            <span class="hotspot-name">Kyoto, Japan</span>
+            <span class="hotspot-vr" style="opacity:0">—</span>
+          </div>
+          <p class="hotspot-desc">Ancient temples, geisha districts & bamboo groves.</p>
+          <div class="hotspot-rating">
+            <span class="star">★★★★★</span><span style="font-size:0.7rem;color:rgba(232,220,200,0.4);margin-left:0.4rem">4.9</span>
+          </div>
+        </div>
+        <div class="map-hotspot" onclick="focusMap(31.6295, -7.9811, 'Marrakech, Morocco')">
+          <div class="hotspot-header">
+            <span class="hotspot-name">Marrakech, Morocco</span>
+            <span class="hotspot-vr">360°</span>
+          </div>
+          <p class="hotspot-desc">Medinas, souks, palaces & the Sahara beyond.</p>
+          <div class="hotspot-rating">
+            <span class="star">★★★★☆</span><span style="font-size:0.7rem;color:rgba(232,220,200,0.4);margin-left:0.4rem">4.7</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PACKAGES -->
+<section class="packages" id="packages">
+  <div style="max-width:1100px;margin:0 auto;">
+    <p class="section-eyebrow">◈ Curated Journeys</p>
+    <h2 class="section-title" style="color:var(--midnight)">Featured<br><em style="font-style:italic;color:var(--terracotta)">Travel Packages</em></h2>
+    <div class="pkg-grid">
+      <div class="pkg-card">
+        <div class="pkg-img">
+          <div class="pkg-bg" style="background:linear-gradient(135deg,#0d47a1,#1e88e5,#64b5f6)"></div>
+          <span class="pkg-tag">Best Seller</span>
+        </div>
+        <div class="pkg-body">
+          <p class="pkg-country">Greece</p>
+          <h3 class="pkg-name">Santorini Sunset Escape</h3>
+          <div class="pkg-features">
+            <span class="pkg-feat">✈ Flights incl.</span>
+            <span class="pkg-feat">🏨 5★ Hotel</span>
+            <span class="pkg-feat">📅 7 nights</span>
+            <span class="pkg-feat">🥂 Breakfast</span>
+          </div>
+          <div class="pkg-footer">
+            <div class="pkg-price"><sup>$</sup><strong>2,490</strong> <span>/ person</span></div>
+            <button class="pkg-book" onclick="bookPackage('Santorini Sunset Escape')">Book Now</button>
+          </div>
+        </div>
+      </div>
+      <div class="pkg-card">
+        <div class="pkg-img">
+          <div class="pkg-bg" style="background:linear-gradient(135deg,#1b5e20,#388e3c,#81c784)"></div>
+          <span class="pkg-tag">VR Included</span>
+        </div>
+        <div class="pkg-body">
+          <p class="pkg-country">Indonesia</p>
+          <h3 class="pkg-name">Bali Spirit Journey</h3>
+          <div class="pkg-features">
+            <span class="pkg-feat">✈ Flights incl.</span>
+            <span class="pkg-feat">🏨 4★ Villa</span>
+            <span class="pkg-feat">📅 10 nights</span>
+            <span class="pkg-feat">🧘 Spa access</span>
+          </div>
+          <div class="pkg-footer">
+            <div class="pkg-price"><sup>$</sup><strong>1,890</strong> <span>/ person</span></div>
+            <button class="pkg-book" onclick="bookPackage('Bali Spirit Journey')">Book Now</button>
+          </div>
+        </div>
+      </div>
+      <div class="pkg-card">
+        <div class="pkg-img">
+          <div class="pkg-bg" style="background:linear-gradient(135deg,#006064,#00acc1,#4dd0e1)"></div>
+          <span class="pkg-tag">Luxury</span>
+        </div>
+        <div class="pkg-body">
+          <p class="pkg-country">Maldives</p>
+          <h3 class="pkg-name">Overwater Bliss Retreat</h3>
+          <div class="pkg-features">
+            <span class="pkg-feat">✈ Private jet</span>
+            <span class="pkg-feat">🏨 5★ Water Villa</span>
+            <span class="pkg-feat">📅 5 nights</span>
+            <span class="pkg-feat">🤿 Diving incl.</span>
+          </div>
+          <div class="pkg-footer">
+            <div class="pkg-price"><sup>$</sup><strong>5,990</strong> <span>/ person</span></div>
+            <button class="pkg-book" onclick="bookPackage('Maldives Overwater Bliss')">Book Now</button>
+          </div>
+        </div>
+      </div>
+      <div class="pkg-card">
+        <div class="pkg-img">
+          <div class="pkg-bg" style="background:linear-gradient(135deg,#4a148c,#7b1fa2,#ba68c8)"></div>
+          <span class="pkg-tag">Cultural</span>
+        </div>
+        <div class="pkg-body">
+          <p class="pkg-country">Japan</p>
+          <h3 class="pkg-name">Kyoto Sakura Trail</h3>
+          <div class="pkg-features">
+            <span class="pkg-feat">✈ Flights incl.</span>
+            <span class="pkg-feat">🏨 Ryokan stay</span>
+            <span class="pkg-feat">📅 8 nights</span>
+            <span class="pkg-feat">🍵 Tea ceremony</span>
+          </div>
+          <div class="pkg-footer">
+            <div class="pkg-price"><sup>$</sup><strong>3,250</strong> <span>/ person</span></div>
+            <button class="pkg-book" onclick="bookPackage('Kyoto Sakura Trail')">Book Now</button>
+          </div>
+        </div>
+      </div>
+      <div class="pkg-card">
+        <div class="pkg-img">
+          <div class="pkg-bg" style="background:linear-gradient(135deg,#bf360c,#e64a19,#ff7043)"></div>
+        </div>
+        <div class="pkg-body">
+          <p class="pkg-country">Morocco</p>
+          <h3 class="pkg-name">Sahara & Medina Explorer</h3>
+          <div class="pkg-features">
+            <span class="pkg-feat">✈ Flights incl.</span>
+            <span class="pkg-feat">🏨 Riad stay</span>
+            <span class="pkg-feat">📅 9 nights</span>
+            <span class="pkg-feat">🐪 Desert camp</span>
+          </div>
+          <div class="pkg-footer">
+            <div class="pkg-price"><sup>$</sup><strong>2,100</strong> <span>/ person</span></div>
+            <button class="pkg-book" onclick="bookPackage('Morocco Explorer')">Book Now</button>
+          </div>
+        </div>
+      </div>
+      <div class="pkg-card">
+        <div class="pkg-img">
+          <div class="pkg-bg" style="background:linear-gradient(135deg,#880e4f,#c2185b,#f48fb1)"></div>
+          <span class="pkg-tag">Honeymoon</span>
+        </div>
+        <div class="pkg-body">
+          <p class="pkg-country">Italy</p>
+          <h3 class="pkg-name">Amalfi Coast Romance</h3>
+          <div class="pkg-features">
+            <span class="pkg-feat">✈ Flights incl.</span>
+            <span class="pkg-feat">🏨 Clifftop hotel</span>
+            <span class="pkg-feat">📅 7 nights</span>
+            <span class="pkg-feat">⛵ Yacht day</span>
+          </div>
+          <div class="pkg-footer">
+            <div class="pkg-price"><sup>$</sup><strong>4,200</strong> <span>/ person</span></div>
+            <button class="pkg-book" onclick="bookPackage('Amalfi Romance')">Book Now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials" id="reviews">
+  <div style="max-width:1100px;margin:0 auto;">
+    <p class="section-eyebrow">◈ Traveller Stories</p>
+    <h2 class="section-title">What our guests<br><em style="font-style:italic;color:var(--clay)">are saying</em></h2>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <div class="testi-quote">"</div>
+        <p class="testi-text">The VR preview sold me instantly. I could stand on the cliffside in Santorini before even booking — and when I arrived, it was exactly as breathtaking as the 360° showed.</p>
+        <div class="testi-author">
+          <div class="testi-avatar">A</div>
+          <div>
+            <div class="testi-name">Amelia Chen</div>
+            <div class="testi-trip">Santorini Package · 2024</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-quote">"</div>
+        <p class="testi-text">Terra's curation is impeccable. Our Bali villa was hidden from every tourist guide — a local gem only true travellers discover. The itinerary was flawless.</p>
+        <div class="testi-author">
+          <div class="testi-avatar">M</div>
+          <div>
+            <div class="testi-name">Marco Ricci</div>
+            <div class="testi-trip">Bali Spirit Journey · 2025</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-quote">"</div>
+        <p class="testi-text">Being able to do a virtual walkthrough of the overwater bungalow before paying that price tag? Absolute game-changer. Fully lived up to the panorama.</p>
+        <div class="testi-author">
+          <div class="testi-avatar">S</div>
+          <div>
+            <div class="testi-name">Sarah & James</div>
+            <div class="testi-trip">Maldives Luxury · 2025</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<div class="newsletter">
+  <h2>Get inspired first</h2>
+  <p>Exclusive deals, VR previews & hidden destinations. No spam, ever.</p>
+  <div class="newsletter-form">
+    <input class="newsletter-input" type="email" placeholder="your@email.com">
+    <button class="newsletter-submit" onclick="handleNewsletter()">Subscribe →</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo">T<span style="color:var(--terracotta)">E</span>RRA</div>
+      <p>Crafting journeys that go beyond the expected. Where luxury meets authenticity, and technology meets the human spirit of travel.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Destinations</h4>
+      <ul>
+        <li><a href="#">Europe</a></li>
+        <li><a href="#">Southeast Asia</a></li>
+        <li><a href="#">Middle East</a></li>
+        <li><a href="#">Americas</a></li>
+        <li><a href="#">Africa</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul>
+        <li><a href="#">VR Tours</a></li>
+        <li><a href="#">Hotel Booking</a></li>
+        <li><a href="#">Flight Search</a></li>
+        <li><a href="#">Travel Insurance</a></li>
+        <li><a href="#">Concierge</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">About Terra</a></li>
+        <li><a href="#">Sustainability</a></li>
+        <li><a href="#">Press</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2025 Terra Travel. All rights reserved.</span>
+    <div class="footer-social">
+      <a href="#" class="social-link">𝕏</a>
+      <a href="#" class="social-link">in</a>
+      <a href="#" class="social-link">ig</a>
+      <a href="#" class="social-link">yt</a>
+    </div>
+  </div>
+</footer>
+
+<!-- VR MODAL -->
+<div class="vr-modal" id="vrModal">
+  <div class="vr-modal-content">
+    <div class="vr-modal-header">
+      <span class="vr-modal-title" id="modalTitle">🌐 360° Virtual Reality Panorama</span>
+      <button class="vr-modal-close" onclick="closeVrModal()">✕</button>
+    </div>
+    <div class="vr-modal-body">
+      <div id="modalPanoCanvas"></div>
+      <div class="vr-overlay"></div>
+      <div class="vr-hud">
+        <div class="vr-location-badge" id="modalBadge">Maldives — Beach Resort</div>
+        <div class="vr-coords" id="modalCoords">4.1755° N, 73.5093° E</div>
+      </div>
+    </div>
+    <div class="vr-modal-footer">
+      <span class="vr-instructions">🖱 Drag to rotate · Scroll to zoom · WASD keys to navigate</span>
+      <div class="vr-place-btns">
+        <button class="vr-place-btn active" onclick="switchModalScene('beach')">Beach</button>
+        <button class="vr-place-btn" onclick="switchModalScene('temple')">Temple</button>
+        <button class="vr-place-btn" onclick="switchModalScene('city')">City</button>
+        <button class="vr-place-btn" onclick="switchModalScene('forest')">Forest</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// PANORAMA ENGINE — Equirectangular 360° Renderer
+// ═══════════════════════════════════════════════
+
+const SCENES = {
+  beach: {
+    name: 'Maldives — Beach Resort',
+    coords: '4.1755° N, 73.5093° E',
+    colors: [
+      {stop:0,   r:32,  g:178, b:170},
+      {stop:0.3, r:64,  g:224, b:208},
+      {stop:0.5, r:135, g:206, b:235},
+      {stop:0.65,r:240, g:230, b:140},
+      {stop:0.8, r:244, g:164, b:96},
+      {stop:1,   r:210, g:105, b:30}
+    ],
+    features: ['water','sky','beach','palm']
+  },
+  temple: {
+    name: 'Kyoto — Fushimi Inari Temple',
+    coords: '34.9671° N, 135.7727° E',
+    colors: [
+      {stop:0,   r:20,  g:40,  b:20},
+      {stop:0.3, r:40,  g:80,  b:40},
+      {stop:0.5, r:160, g:82,  b:45},
+      {stop:0.65,r:205, b:92,  b:92},
+      {stop:0.8, r:178, g:34,  b:34},
+      {stop:1,   r:100, g:20,  b:20}
+    ],
+    features: ['torii','trees','path']
+  },
+  city: {
+    name: 'Santorini — Oia Village',
+    coords: '36.4618° N, 25.3753° E',
+    colors: [
+      {stop:0,   r:25,  g:50,  b:100},
+      {stop:0.3, r:65,  g:105, b:170},
+      {stop:0.5, r:135, g:190, b:220},
+      {stop:0.65,r:245, g:245, b:245},
+      {stop:0.8, r:200, g:210, b:220},
+      {stop:1,   r:150, g:160, b:180}
+    ],
+    features: ['buildings','sea','sky']
+  },
+  forest: {
+    name: 'Bali — Sacred Monkey Forest',
+    coords: '8.5186° S, 115.2620° E',
+    colors: [
+      {stop:0,   r:15,  g:50,  b:15},
+      {stop:0.25,r:20,  g:80,  b:20},
+      {stop:0.5, r:34,  g:120, b:34},
+      {stop:0.65,r:50,  g:150, b:50},
+      {stop:0.8, r:80,  g:180, b:80},
+      {stop:1,   r:120, g:200, b:100}
+    ],
+    features: ['trees','canopy','ground']
+  }
+};
+
+// ── Init renderers
+let miniPano = null;
+let modalPano = null;
+
+window.addEventListener('load', () => {
+  const mc = document.getElementById('panoCanvas');
+  mc.height = 400;
+  miniPano = new PanoramaRenderer(mc);
+});
+
+// ── VR Scene switching
+const sceneData = {
+  beach:  { name:'Maldives — Beach Resort', coords:'4.1755° N, 73.5093° E' },
+  temple: { name:'Kyoto — Fushimi Inari', coords:'34.9671° N, 135.7727° E' },
+  city:   { name:'Santorini — Oia Village', coords:'36.4618° N, 25.3753° E' },
+  forest: { name:'Bali — Sacred Monkey Forest', coords:'8.5186° S, 115.2620° E' }
+};
+
+function switchVrScene(scene) {
+  if(miniPano) miniPano.setScene(scene);
+  const d = sceneData[scene];
+  document.getElementById('vrLocationBadge').textContent = d.name;
+  document.getElementById('vrCoords').textContent = d.coords;
+  document.querySelectorAll('.vr-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+function rotatePano(dyaw, dpitch=0) {
+  if(miniPano) miniPano.rotate(dyaw, dpitch);
+}
+
+// ── Modal
+function openVrModal(scene='beach') {
+  const modal = document.getElementById('vrModal');
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if(!modalPano) {
+    const mc2 = document.getElementById('modalPanoCanvas');
+    mc2.height = 500;
+    modalPano = new PanoramaRenderer(mc2);
+  }
+  modalPano.setScene(scene);
+  const d = sceneData[scene] || sceneData['beach'];
+  document.getElementById('modalBadge').textContent = d.name;
+  document.getElementById('modalCoords').textContent = d.coords;
+  document.getElementById('modalTitle').textContent = `🌐 ${d.name} — 360° Panorama`;
+  document.querySelectorAll('.vr-place-btn').forEach(b => b.classList.remove('active'));
+  const matchBtn = [...document.querySelectorAll('.vr-place-btn')].find(b => b.textContent.toLowerCase().includes(scene.substring(0,3)));
+  if(matchBtn) matchBtn.classList.add('active');
+}
+
+function closeVrModal() {
+  document.getElementById('vrModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function switchModalScene(scene) {
+  if(modalPano) modalPano.setScene(scene);
+  const d = sceneData[scene];
+  document.getElementById('modalBadge').textContent = d.name;
+  document.getElementById('modalCoords').textContent = d.coords;
+  document.getElementById('modalTitle').textContent = `🌐 ${d.name} — 360° Panorama`;
+  document.querySelectorAll('.vr-place-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+// Close modal on backdrop click
+document.getElementById('vrModal').addEventListener('click', function(e) {
+  if(e.target === this) closeVrModal();
+});
+
+// ── Search handler
+function handleSearch() {
+  const dest = document.querySelector('.search-field input').value;
+  if(dest) {
+    showToast(`🔍 Searching for "${dest}"...`);
+    setTimeout(() => showToast(`✈ ${dest} packages loaded!`), 1200);
+  } else showToast('Please enter a destination');
+}
+
+// ── Book handler
+function bookPackage(name) {
+  showToast(`🎉 Booking "${name}" — redirecting to checkout...`);
+}
+
+// ── Newsletter
+function handleNewsletter() {
+  const email = document.querySelector('.newsletter-input').value;
+  if(email && email.includes('@')) {
+    showToast(`✉ Welcome! Subscribed with ${email}`);
+  } else showToast('Please enter a valid email');
+}
+
+// ── Map focus
+function focusMap(lat, lng, name) {
+  document.querySelectorAll('.map-hotspot').forEach(h => h.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  showToast(`📍 Focused on ${name}`);
+}
+
+// ── Toast notification
+function showToast(msg) {
+  const existing = document.querySelector('.toast');
+  if(existing) existing.remove();
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  t.style.cssText = `
+    position:fixed;bottom:2rem;right:2rem;z-index:3000;
+    background:var(--dusk);color:var(--sand);
+    padding:0.9rem 1.6rem;font-size:0.8rem;letter-spacing:0.06em;
+    border-left:3px solid var(--terracotta);
+    box-shadow:0 8px 30px rgba(0,0,0,0.3);
+    animation:slideIn 0.35s ease both;font-family:'Epilogue',sans-serif;
+  `;
+  const style = document.createElement('style');
+  style.textContent = '@keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}';
+  document.head.appendChild(style);
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+// Resize canvases on window resize
+window.addEventListener('resize', () => {
+  if(miniPano) { miniPano.resize(); }
+  if(modalPano) { modalPano.resize(); }
+});
+
+// Nav scroll effect
+window.addEventListener('scroll', () => {
+  document.querySelector('nav').style.background = window.scrollY > 50
+    ? 'rgba(10,18,24,0.97)' : 'rgba(15,25,35,0.85)';
+});
+</script>
+</body>
+</html>
